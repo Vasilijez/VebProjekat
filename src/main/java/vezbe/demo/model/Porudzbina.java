@@ -13,11 +13,10 @@ public class Porudzbina implements Serializable {
     @Id
     @GeneratedValue
     private UUID id;
-    @ManyToMany
-    @JoinTable(name = "porudzbine_artikli",
-            joinColumns = { @JoinColumn(name = "porudzbina_id", referencedColumnName = "id") },
-            inverseJoinColumns = { @JoinColumn(name = "artikal_id", referencedColumnName = "id") })
-    private Set<Artikal> artikli = new HashSet<>();
+
+    @OneToMany(mappedBy = "porudzbina", cascade = CascadeType.ALL)
+    private Set<ArtikalPorudzbina> artikli;
+
     @ManyToOne(fetch = FetchType.LAZY)   // fetch, cascade
     private Restoran restoran;
     @Column
@@ -40,11 +39,8 @@ public class Porudzbina implements Serializable {
     public Porudzbina() {
     }
 
-    public Porudzbina(Set<Artikal> artikli, Restoran restoran, Date datum_vreme, double cena, Kupac kupac, Status status) {
-        this.artikli = artikli;
+    public Porudzbina(Restoran restoran, Kupac kupac, Status status) {
         this.restoran = restoran;
-        this.datum_vreme = datum_vreme;
-        this.cena = cena;
         this.kupac = kupac;
         this.status = status;
     }
@@ -57,11 +53,11 @@ public class Porudzbina implements Serializable {
         this.id = id;
     }
 
-    public Set<Artikal> getArtikli() {
+    public Set<ArtikalPorudzbina> getArtikli() {
         return artikli;
     }
 
-    public void setArtikli(Set<Artikal> artikli) {
+    public void setArtikli(Set<ArtikalPorudzbina> artikli) {
         this.artikli = artikli;
     }
 

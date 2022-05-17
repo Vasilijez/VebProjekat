@@ -39,6 +39,9 @@ public class DatabaseConfiguration {
     private ArtikalRepository artikalRepository;
 
     @Autowired
+    private ArtikalPorudzbinaRepository artikalPorudzbinaRepository;
+
+    @Autowired
     private PorudzbinaRepository porudzbinaRepository;
 
     @Autowired
@@ -98,7 +101,7 @@ public class DatabaseConfiguration {
         Restoran restoran3 = new Restoran("Jefta", "Brza hrana", artikli3, lokacija3);
         restoranRepository.save(restoran3);
 
-        Date date1 = new Date(1999-1900, 01, 10); // datum nam ne prikazuje kako treba
+        Date date1 = new Date(29, 01, 10); // datum nam ne prikazuje kako treba
         Date date2 = new Date(1980-1900,05,11);
         Date date3 = new Date(1972-1900,10,05);
         Menadzer menadzer1 = new Menadzer("peraperic", "peraperic123", "Pera", "Peric", Korisnik.Pol.MUSKO, date1, restoran1, Korisnik.Uloga.Menadzer);
@@ -118,10 +121,35 @@ public class DatabaseConfiguration {
         Date date6 = new Date(2022-1900, 04,12,21,15,03);
 
         Kupac kupac1 = new Kupac("ivanaivanic", "ivanaivanic123", "Ivana", "Ivanic", Korisnik.Pol.ZENSKO, date1, Korisnik.Uloga.Kupac, null, 200, tip2);
-        Porudzbina porudzbina1 = new Porudzbina(artikli1, restoran1, date4, 1300, kupac1, Porudzbina.Status.obrada);
-        Porudzbina porudzbina2 = new Porudzbina(artikli2, restoran2, date5, 1200, kupac1, Porudzbina.Status.u_pripremi);
         Kupac kupac2 = new Kupac("jovajovic", "jovajovic123", "Jova", "Jovic", Korisnik.Pol.MUSKO, date2, Korisnik.Uloga.Kupac, null, 500, tip1);
-        Porudzbina porudzbina3 = new Porudzbina(artikli3, restoran3, date6, 900, kupac2, Porudzbina.Status.u_pripremi);
+        kupacRepository.save(kupac1);
+        kupacRepository.save(kupac2);
+
+        Porudzbina porudzbina1 = new Porudzbina(restoran1, kupac1, Porudzbina.Status.obrada);
+        Porudzbina porudzbina2 = new Porudzbina(restoran2, kupac1, Porudzbina.Status.u_pripremi);
+        porudzbinaRepository.save(porudzbina1);
+        porudzbinaRepository.save(porudzbina2);
+
+        ArtikalPorudzbina ap1 = new ArtikalPorudzbina(artikal1, porudzbina1, 3);
+        artikalPorudzbinaRepository.save(ap1);
+        porudzbina1.setArtikli(Set.of(ap1));
+        porudzbina1.setCena(artikal1.getCena()*ap1.getKolicina());
+        porudzbina1.setDatum_vreme(date4);
+
+        ArtikalPorudzbina ap2 = new ArtikalPorudzbina(artikal9, porudzbina2, 4);
+        artikalPorudzbinaRepository.save(ap2);
+        porudzbina2.setArtikli(Set.of(ap2));
+        porudzbina2.setCena(artikal9.getCena()*ap2.getKolicina());
+        porudzbina2.setDatum_vreme(date5);
+
+        Porudzbina porudzbina3 = new Porudzbina(restoran3, kupac2, Porudzbina.Status.u_pripremi);
+        porudzbinaRepository.save(porudzbina3);
+
+        ArtikalPorudzbina ap3 = new ArtikalPorudzbina(artikal6, porudzbina3, 6);
+        artikalPorudzbinaRepository.save(ap3);
+        porudzbina3.setArtikli(Set.of(ap3));
+        porudzbina3.setCena(artikal6.getCena()*ap3.getKolicina());
+        porudzbina3.setDatum_vreme(date6);
 
         Set<Porudzbina> istorija1 = new HashSet<>();
         istorija1.add(porudzbina1);
@@ -130,13 +158,6 @@ public class DatabaseConfiguration {
         Set<Porudzbina> istorija2 = new HashSet<>();
         istorija2.add(porudzbina3);
         kupac2.setIstorija_porudzbina(istorija2);
-
-        kupacRepository.save(kupac1);
-        kupacRepository.save(kupac2);
-        porudzbinaRepository.save(porudzbina1);
-        porudzbinaRepository.save(porudzbina2);
-        porudzbinaRepository.save(porudzbina3);
-
 
         Dostavljac dostavljac1 = new Dostavljac("markomaric", "markomaric123", "Marko", "Maric", Korisnik.Pol.MUSKO, date3, Korisnik.Uloga.Dostavljac, istorija1);
         dostavljacRepository.save(dostavljac1);
