@@ -7,4 +7,5 @@ import vezbe.demo.model.Kupac;
 @Repository
 public interface KupacRepository extends JpaRepository<Kupac, Long> {
 
+    public Kupac findKupacByKorisnickoIme(String korisnicko_ime);
 }
