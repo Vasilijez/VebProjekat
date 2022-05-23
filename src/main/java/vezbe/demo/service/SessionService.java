@@ -7,7 +7,6 @@ import javax.servlet.http.HttpSession;
 @Service
 public class SessionService {
 
-
     public boolean validateUloga(HttpSession session, String NazivUloge){
         Object uloga= session.getAttribute("uloga");
         if (uloga == null) return false;
