@@ -1,30 +1,53 @@
 package vezbe.demo.dto;
 
+import vezbe.demo.model.Korisnik;
 import vezbe.demo.model.Kupac;
 
-public class RegisterDto {
+import java.util.Date;
 
-    private String korisnicko_ime;
+
+public class RegisterDto {
+    private String korisnickoIme;
     private String lozinka;
     private String ime;
     private String prezime;
+    private Korisnik.Pol pol;  // dodao
+    private Date datum_rodjenja;  // dodao
 
     public RegisterDto() {
     }
 
-    public RegisterDto(String korisnicko_ime, String lozinka, String ime, String prezime) {
-        this.korisnicko_ime = korisnicko_ime;
+    public RegisterDto(String korisnicko_ime, String lozinka, String ime, String prezime, Korisnik.Pol pol, Date datum_rodjenja) {
+        this.korisnickoIme = korisnicko_ime;
         this.lozinka = lozinka;
         this.ime = ime;
         this.prezime = prezime;
+        this.pol = pol;
+        this.datum_rodjenja = datum_rodjenja;
     }
 
-    public String getKorisnicko_ime() {
-        return korisnicko_ime;
+    public Korisnik.Pol getPol() {
+        return pol;
     }
 
-    public void setKorisnicko_ime(String korisnicko_ime) {
-        this.korisnicko_ime = korisnicko_ime;
+    public void setPol(Korisnik.Pol pol) {
+        this.pol = pol;
+    }
+
+    public Date getDatum_rodjenja() {
+        return datum_rodjenja;
+    }
+
+    public void setDatum_rodjenja(Date datum_rodjenja) {
+        this.datum_rodjenja = datum_rodjenja;
+    }
+
+    public String getKorisnickoIme() {
+        return korisnickoIme;
+    }
+
+    public void setKorisnickoIme(String korisnickoIme) {
+        this.korisnickoIme = korisnickoIme;
     }
 
     public String getLozinka() {
@@ -51,9 +74,8 @@ public class RegisterDto {
         this.prezime = prezime;
     }
 
-
     public Kupac ToKupac(){
-        return new Kupac(korisnicko_ime, lozinka, ime, prezime);
+        return new Kupac(korisnickoIme, lozinka, ime, prezime, pol, datum_rodjenja, Korisnik.Uloga.Kupac, null, 0, null);  // dodao
     }
 
 }

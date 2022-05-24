@@ -13,15 +13,15 @@ import java.util.List;
 public class RegisterService {
 
     @Autowired
-    private KorisnikRepository korisnikRepository;
-
-    @Autowired
     private KupacRepository kupacRepository;
 
-    public void Register(Korisnik korisnik, String uloga) throws Exception {
-        CheckUserAgainst(korisnik.getKorisnicko_ime(), (List<Korisnik>) ((List<?>)korisnikRepository.findAll()));
+    @Autowired
+    private KorisnikRepository korisnikRepository;
 
-        if (uloga.equals("kupac")){
+    public void Register(Korisnik korisnik, String uloga) throws Exception {
+        CheckUserAgainst(korisnik.getKorisnickoIme(), (List<Korisnik>) ((List<?>)korisnikRepository.findAll())); // Iako registrujemo samo kupca, njegov username moze biti koriscen i za druge uloge odnosno korisnike
+
+        if (uloga.equals("Kupac")){ // Promenio "kupac" u "Kupac", jer je "Kupac" prosledjen. Uloge pisem velikim pocetnim slovom
             kupacRepository.save((Kupac) korisnik);
         }
         else{
@@ -31,7 +31,7 @@ public class RegisterService {
 
     private void CheckUserAgainst(String korisnicko_ime, List<Korisnik> set) throws Exception {
         for(Korisnik k : set){
-            if (k.getKorisnicko_ime().equals(korisnicko_ime))
+            if (k.getKorisnickoIme().equals(korisnicko_ime))
                 ThrowUsernameInvalid(korisnicko_ime);
         }
     }
