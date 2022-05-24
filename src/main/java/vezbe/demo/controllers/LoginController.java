@@ -19,7 +19,6 @@ import java.util.Hashtable;
 @RestController
 public class LoginController {
 
-
     @Autowired
     private LoginService loginService;
     @Autowired
@@ -29,7 +28,7 @@ public class LoginController {
     public ResponseEntity Login(@RequestBody LoginDto loginDto, HttpSession session){
         Hashtable<String, String> errorDic = new Hashtable<>();
 
-        if(loginDto.getKorisnicko_ime() == null || loginDto.getKorisnicko_ime().isEmpty())
+        if(loginDto.getKorisnickoIme() == null || loginDto.getKorisnickoIme().isEmpty())
             errorDic.put("korisnicko_ime", "Korisnicko ime je obavezno");
         if (loginDto.getLozinka() == null || loginDto.getLozinka().isEmpty())
             errorDic.put("lozinka", "Lozinka je obavezna");
@@ -40,7 +39,7 @@ public class LoginController {
         Korisnik korisnik = null;
 
         try {
-            korisnik = loginService.Login(loginDto.getKorisnicko_ime(), loginDto.getLozinka());
+            korisnik = loginService.Login(loginDto.getKorisnickoIme(), loginDto.getLozinka());
         } catch (AccountNotFoundException e) {
             errorDic.put("Korisnicko ime", e.getMessage());
         } catch (InvalidAttributeValueException e) {
@@ -50,8 +49,8 @@ public class LoginController {
         if (!errorDic.isEmpty() || korisnik == null)
             return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
 
-        session.setAttribute("uloga", korisnik.getClass().getName());
-        session.setAttribute("korisnicko ime", korisnik.getKorisnicko_ime());
+        session.setAttribute("uloga", korisnik.getUloga()); // mislim da ovo nije dobro, getClass().getName()? - izmenio
+        session.setAttribute("korisnicko_ime", korisnik.getKorisnickoIme());         // videcu da li ce mi ovo koristiti korisnickoIme - po potrebi menjati
 
         return new ResponseEntity(korisnik, HttpStatus.OK);
     }
