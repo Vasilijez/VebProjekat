@@ -22,8 +22,8 @@ public abstract class Korisnik {
         Dostavljac
     }
 
-    @Column
-    private String korisnicko_ime;
+    @Column(unique = true)
+    private String korisnickoIme;
     @Column
     private String lozinka;
     @Column
@@ -40,8 +40,15 @@ public abstract class Korisnik {
     public Korisnik() {
     }
 
+    public Korisnik(String korisnicko_ime, String lozinka, String ime, String prezime) {
+        this.korisnickoIme = korisnicko_ime;
+        this.lozinka = lozinka;
+        this.ime = ime;
+        this.prezime = prezime;
+    }
+
     public Korisnik(String korisnicko_ime, String lozinka, String ime, String prezime, Pol p, Date datum_rodjenja, Uloga uloga) {
-        this.korisnicko_ime = korisnicko_ime;
+        this.korisnickoIme = korisnicko_ime;
         this.lozinka = lozinka;
         this.ime = ime;
         this.prezime = prezime;
@@ -59,11 +66,11 @@ public abstract class Korisnik {
     }
 
     public String getKorisnicko_ime() {
-        return korisnicko_ime;
+        return korisnickoIme;
     }
 
     public void setKorisnicko_ime(String korisnicko_ime) {
-        this.korisnicko_ime = korisnicko_ime;
+        this.korisnickoIme = korisnicko_ime;
     }
 
     public String getLozinka() {
@@ -117,7 +124,7 @@ public abstract class Korisnik {
     @Override
     public String toString() {
         return "Korisnik{" +
-                "korisnicko_ime='" + korisnicko_ime + '\'' +
+                "korisnicko_ime='" + korisnickoIme + '\'' +
                 ", lozinka='" + lozinka + '\'' +
                 ", ime='" + ime + '\'' +
                 ", prezime='" + prezime + '\'' +

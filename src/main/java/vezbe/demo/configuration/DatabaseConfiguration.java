@@ -135,12 +135,14 @@ public class DatabaseConfiguration {
         porudzbina1.setArtikli(Set.of(ap1));
         porudzbina1.setCena(artikal1.getCena()*ap1.getKolicina());
         porudzbina1.setDatum_vreme(date4);
+        porudzbinaRepository.save(porudzbina1); // naknadno dodao
 
         ArtikalPorudzbina ap2 = new ArtikalPorudzbina(artikal9, porudzbina2, 4);
         artikalPorudzbinaRepository.save(ap2);
         porudzbina2.setArtikli(Set.of(ap2));
         porudzbina2.setCena(artikal9.getCena()*ap2.getKolicina());
         porudzbina2.setDatum_vreme(date5);
+        porudzbinaRepository.save(porudzbina2); // naknadno dodao
 
         Porudzbina porudzbina3 = new Porudzbina(restoran3, kupac2, Porudzbina.Status.u_pripremi);
         porudzbinaRepository.save(porudzbina3);
@@ -150,14 +152,18 @@ public class DatabaseConfiguration {
         porudzbina3.setArtikli(Set.of(ap3));
         porudzbina3.setCena(artikal6.getCena()*ap3.getKolicina());
         porudzbina3.setDatum_vreme(date6);
+        porudzbinaRepository.save(porudzbina3); // naknadno dodao
 
         Set<Porudzbina> istorija1 = new HashSet<>();
         istorija1.add(porudzbina1);
         istorija1.add(porudzbina2);
         kupac1.setIstorija_porudzbina(istorija1);
+        kupacRepository.save(kupac1);   // naknadno dodao
         Set<Porudzbina> istorija2 = new HashSet<>();
         istorija2.add(porudzbina3);
         kupac2.setIstorija_porudzbina(istorija2);
+        kupacRepository.save(kupac2); // naknadno dodao
+
 
         Dostavljac dostavljac1 = new Dostavljac("markomaric", "markomaric123", "Marko", "Maric", Korisnik.Pol.MUSKO, date3, Korisnik.Uloga.Dostavljac, istorija1);
         dostavljacRepository.save(dostavljac1);
@@ -166,7 +172,9 @@ public class DatabaseConfiguration {
         adminRepository.save(admin1);
 
         Komentar komentar1 = new Komentar(kupac1, restoran1, "Ekstra hrana!", 5);
+        Komentar komentar2 = new Komentar(kupac2, restoran2, "Okej je.", 3);
         komentarRepository.save(komentar1);
+        komentarRepository.save(komentar2);
 
         return true;
     }
