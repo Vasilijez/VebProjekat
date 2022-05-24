@@ -7,4 +7,6 @@ import vezbe.demo.model.Korisnik;
 @Repository
 public interface KorisnikRepository extends JpaRepository<Korisnik, Long> {
 
+    public Korisnik findByKorisnickoIme(String korisnickoIme);
+
 }

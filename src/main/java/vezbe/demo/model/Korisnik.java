@@ -65,12 +65,12 @@ public abstract class Korisnik {
         this.id = id;
     }
 
-    public String getKorisnicko_ime() {
+    public String getKorisnickoIme() {
         return korisnickoIme;
     }
 
-    public void setKorisnicko_ime(String korisnicko_ime) {
-        this.korisnickoIme = korisnicko_ime;
+    public void setKorisnickoIme(String korisnickoIme) {
+        this.korisnickoIme = korisnickoIme;
     }
 
     public String getLozinka() {
