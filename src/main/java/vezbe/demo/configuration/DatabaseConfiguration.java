@@ -125,15 +125,17 @@ public class DatabaseConfiguration {
         kupacRepository.save(kupac1);
         kupacRepository.save(kupac2);
 
-        Porudzbina porudzbina1 = new Porudzbina(restoran1, kupac1, Porudzbina.Status.obrada);
+        Porudzbina porudzbina1 = new Porudzbina(restoran1, kupac1, Porudzbina.Status.ceka_dostavljaca);
         Porudzbina porudzbina2 = new Porudzbina(restoran2, kupac1, Porudzbina.Status.u_pripremi);
         porudzbinaRepository.save(porudzbina1);
         porudzbinaRepository.save(porudzbina2);
 
         ArtikalPorudzbina ap1 = new ArtikalPorudzbina(artikal1, porudzbina1, 3);
+        ArtikalPorudzbina ap4 = new ArtikalPorudzbina(artikal7, porudzbina1, 9); // dodao
         artikalPorudzbinaRepository.save(ap1);
-        porudzbina1.setArtikli(Set.of(ap1));
-        porudzbina1.setCena(artikal1.getCena()*ap1.getKolicina());
+        artikalPorudzbinaRepository.save(ap4);
+        porudzbina1.setArtikli(Set.of(ap1, ap4));
+        porudzbina1.setCena(artikal1.getCena()*ap1.getKolicina()+artikal7.getCena()* ap4.getKolicina());
         porudzbina1.setDatum_vreme(date4);
         porudzbinaRepository.save(porudzbina1); // naknadno dodao
 
@@ -144,7 +146,7 @@ public class DatabaseConfiguration {
         porudzbina2.setDatum_vreme(date5);
         porudzbinaRepository.save(porudzbina2); // naknadno dodao
 
-        Porudzbina porudzbina3 = new Porudzbina(restoran3, kupac2, Porudzbina.Status.u_pripremi);
+        Porudzbina porudzbina3 = new Porudzbina(restoran3, kupac2, Porudzbina.Status.ceka_dostavljaca);
         porudzbinaRepository.save(porudzbina3);
 
         ArtikalPorudzbina ap3 = new ArtikalPorudzbina(artikal6, porudzbina3, 6);
