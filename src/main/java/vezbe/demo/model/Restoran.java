@@ -1,6 +1,6 @@
 package vezbe.demo.model;
 
-import vezbe.demo.model.Artikal;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,8 +18,9 @@ public class Restoran implements Serializable {
     private String naziv;
 
     @Column
-    private String tip_restorana;
+    private String tipRestorana;
 
+    @JsonIgnore // dodao
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Artikal> artikli = new HashSet<>();
 
@@ -31,7 +32,7 @@ public class Restoran implements Serializable {
 
     public Restoran(String naziv, String tip_restorana, Set<Artikal> artikli, Lokacija lokacija) {
         this.naziv = naziv;
-        this.tip_restorana = tip_restorana;
+        this.tipRestorana = tip_restorana;
         this.artikli = artikli;
         this.lokacija = lokacija;
     }
@@ -52,12 +53,12 @@ public class Restoran implements Serializable {
         this.naziv = naziv;
     }
 
-    public String getTip_restorana() {
-        return tip_restorana;
+    public String getTipRestorana() {
+        return tipRestorana;
     }
 
-    public void setTip_restorana(String tip_restorana) {
-        this.tip_restorana = tip_restorana;
+    public void setTipRestorana(String tip_restorana) {
+        this.tipRestorana = tip_restorana;
     }
 
     public Set<Artikal> getArtikli() {
@@ -80,7 +81,7 @@ public class Restoran implements Serializable {
     public String toString() {
         return "Restoran{" +
                 " naziv='" + naziv + '\'' +
-                ", tip_restorana=" + tip_restorana +
+                ", tip_restorana=" + tipRestorana +
                 ", artikli=" + artikli +
                 ", lokacija=" + lokacija +
                 '}';
