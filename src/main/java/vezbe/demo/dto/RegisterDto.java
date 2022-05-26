@@ -1,8 +1,13 @@
 package vezbe.demo.dto;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import vezbe.demo.model.Korisnik;
 import vezbe.demo.model.Kupac;
+import vezbe.demo.model.TipKupca;
+import vezbe.demo.repository.TipKupcaRepository;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 

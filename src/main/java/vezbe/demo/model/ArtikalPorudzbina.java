@@ -1,5 +1,7 @@
 package vezbe.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,6 +15,7 @@ public class ArtikalPorudzbina {
     @JoinColumn(name = "artikal_id")
     private Artikal artikal;
 
+    @JsonIgnore // dodao
     @ManyToOne
     @JoinColumn(name = "porudzbina_id")
     private Porudzbina porudzbina;

@@ -7,16 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.ArtikalDto;
 import vezbe.demo.dto.RestoranDto;
 import vezbe.demo.dto.RestoranPojedinacniDto;
-import vezbe.demo.model.Artikal;
-import vezbe.demo.model.Korisnik;
-import vezbe.demo.model.Menadzer;
-import vezbe.demo.model.Restoran;
+import vezbe.demo.model.*;
 import vezbe.demo.service.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @RequestMapping("api")
 @RestController
@@ -107,11 +102,11 @@ public class RestoranController {
         }
 
         if (restoranDto.getLokacija() != null &&
-            ( ((restoranDto.getLokacija().getAdresa() != null) && (!restoranDto.getLokacija().getAdresa().isEmpty())) ||
-              (restoranDto.getLokacija().getSirina() != 0)  ||
-              (restoranDto.getLokacija().getSirina() != 0)
-            )
-           ) {
+                ( ((restoranDto.getLokacija().getAdresa() != null) && (!restoranDto.getLokacija().getAdresa().isEmpty())) ||
+                        (restoranDto.getLokacija().getSirina() != 0)  ||
+                        (restoranDto.getLokacija().getSirina() != 0)
+                )
+        ) {
             listaRestorana = restoranService.searchByLokacija(restoranDto.getLokacija());
             if (!listaRestorana.isEmpty()) {
                 for (Restoran restoran : listaRestorana) {
