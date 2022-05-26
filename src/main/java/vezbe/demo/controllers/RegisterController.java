@@ -10,6 +10,7 @@ import vezbe.demo.dto.RegisterDto;
 import vezbe.demo.model.Kupac;
 import vezbe.demo.service.KupacService;
 import vezbe.demo.service.RegisterService;
+import vezbe.demo.service.SessionService;
 
 import java.util.Date;
 import java.util.HashMap;

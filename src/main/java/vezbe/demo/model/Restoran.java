@@ -1,6 +1,7 @@
 package vezbe.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import vezbe.demo.model.Artikal;
 
 import javax.persistence.*;
 import java.io.Serializable;

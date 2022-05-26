@@ -2,6 +2,8 @@ package vezbe.demo.dto;
 
 import vezbe.demo.model.Artikal;
 
+import javax.persistence.Column;
+
 public class ArtikalDto {
 
     private String naziv;

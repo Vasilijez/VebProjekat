@@ -2,6 +2,7 @@ package vezbe.demo.dto;
 
 import vezbe.demo.model.Korisnik;
 
+import javax.persistence.Column;
 import java.util.Date;
 
 public class KorisnikDto {

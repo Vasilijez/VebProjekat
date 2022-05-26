@@ -1,5 +1,7 @@
 package vezbe.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -19,12 +21,17 @@ public class Porudzbina implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)   // fetch, cascade
     private Restoran restoran;
+
     @Column
     private Date datum_vreme;
+
     @Column
     private double cena;
+
+    @JsonIgnore // dodao
     @ManyToOne(fetch = FetchType.LAZY)
     private Kupac kupac;
+
     public enum Status {
         obrada,
         u_pripremi,

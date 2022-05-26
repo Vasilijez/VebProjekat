@@ -1,5 +1,6 @@
 package vezbe.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jdk.jfr.Enabled;
 
 import javax.persistence.*;
@@ -13,7 +14,10 @@ public class Komentar implements Serializable {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Kupac kupac;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Restoran restoran;
     @Column

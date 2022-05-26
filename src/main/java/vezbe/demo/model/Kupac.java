@@ -1,5 +1,7 @@
 package vezbe.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -8,6 +10,7 @@ import java.util.Set;
 
 @Entity
 public class Kupac extends Korisnik implements Serializable {
+
 
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

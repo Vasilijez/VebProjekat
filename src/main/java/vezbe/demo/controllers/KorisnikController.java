@@ -1,21 +1,22 @@
 package vezbe.demo.controllers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import vezbe.demo.dto.KorisnikAzuriranDto;
-import vezbe.demo.dto.KorisnikDto;
-import vezbe.demo.dto.MenadzerDto;
-import vezbe.demo.dto.RestoranDto;
+import vezbe.demo.dto.*;
 import vezbe.demo.model.*;
+import vezbe.demo.repository.MenadzerRepository;
 import vezbe.demo.service.*;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import javax.swing.text.html.HTML;
+import java.util.*;
 
 
 @RequestMapping("/api")

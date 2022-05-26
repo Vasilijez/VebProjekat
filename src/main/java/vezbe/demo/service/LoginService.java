@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vezbe.demo.model.Korisnik;
 import vezbe.demo.repository.KorisnikRepository;
+import vezbe.demo.repository.KupacRepository;
 
 import javax.management.InvalidAttributeValueException;
 import javax.security.auth.login.AccountNotFoundException;

@@ -1,6 +1,15 @@
 package vezbe.demo.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import vezbe.demo.model.Artikal;
 import vezbe.demo.model.Lokacija;
+
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RestoranDto {
 
