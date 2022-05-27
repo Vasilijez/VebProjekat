@@ -217,10 +217,10 @@ public class RestoranController {
             errorDic.put("Naziv", "Polje naziv je neispravno uneseno");
         if (artikalDto.getNaziv() != null && (artikalService.CheckNazivAgainst(artikalDto.getNaziv())))
             errorDic.put("Naziv", "Naziv artikla vec postoji, unesite drugi");
-        if (artikalDto.getCena() <= 0)
+        if (artikalDto.getCena() < 0)
             errorDic.put("Cena", "Polje cena je neispravno uneseno");
         // ostaje provera za sliku da se odradi
-        if (artikalDto.getKolicina() <= 0)
+        if (artikalDto.getKolicina() < 0)
             errorDic.put("Kolicina", "Polje kolicina je neispravno uneseno");
 
 

@@ -184,6 +184,7 @@ public class KorisnikController {
                 return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
             }
 
+            lokacijaService.save(restoranDto.getLokacija());
             Restoran restoran = new Restoran(restoranDto.getNaziv(), restoranDto.getTipRestorana(), null, restoranDto.getLokacija());
             restoranService.save(restoran);
 
