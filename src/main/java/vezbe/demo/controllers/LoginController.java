@@ -2,6 +2,7 @@ package vezbe.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,9 @@ public class LoginController {
     @Autowired
     private SessionService sessionService;
 
-    @PostMapping("api/login")
+    @PostMapping(value = "api/login",
+            consumes = MediaType.APPLICATION_JSON_VALUE,     // tip podataka koje metoda može da primi
+            produces = MediaType.APPLICATION_JSON_VALUE)     // tip odgovora)
     public ResponseEntity Login(@RequestBody LoginDto loginDto, HttpSession session){
         Hashtable<String, String> errorDic = new Hashtable<>();
 
