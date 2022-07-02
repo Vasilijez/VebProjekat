@@ -61,6 +61,42 @@ public class RestoranController {
         return restoranDtoList;
     }
 
+    @GetMapping(
+            value = "/restorani-bez-menadzera",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity prikazRestoranaBezMenadzera(HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            List<Restoran> listaRestoran = restoranService.findAll();
+            List<RestoranDto> restoranDtoList = new ArrayList<>();
+
+            List<Menadzer> menadzerList = menadzerService.findAll();
+            List<Restoran> finalnaLista = new ArrayList<>();
+            for (Restoran restoran : listaRestoran) {
+                finalnaLista.add(restoran);
+            }
+
+            for (Restoran restoran:
+                    listaRestoran) {
+                for (Menadzer menadzer : menadzerList) {
+                    if (menadzer.getRestoran() == restoran) {
+                        finalnaLista.remove(restoran);
+                        break;
+                    }
+                }
+            }
+
+            for (Restoran restoran : finalnaLista) {
+                RestoranDto restoranDto = new RestoranDto(restoran.getNaziv(), restoran.getTipRestorana(), restoran.getLokacija());
+                restoranDtoList.add(restoranDto);
+            }
+
+            return new ResponseEntity(restoranDtoList, HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+
     @GetMapping("search/naziv/{naziv}") // ok
     public List<RestoranDto> search(@PathVariable("naziv") String naziv) {
         List<Restoran> listaRestoran = restoranService.findByNazivLikeCaseInsensitive(naziv);

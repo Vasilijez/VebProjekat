@@ -273,5 +273,46 @@ public class KorisnikController {
         return errorDic;
     }
 
+    @GetMapping(
+            value = "menadzeri",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity pregledMenadzera(HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+            List<Menadzer> menadzerList = menadzerService.findAll();
+
+            // todo preko MenadzerDTO, mrzi me sada
+
+            return new ResponseEntity(menadzerList, HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping(
+            value = "/menadzeri-bez-restorana",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity prikazMenadzeraBezRestorana(HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            List<Menadzer> menadzerList = menadzerService.findAll();
+            List<Menadzer> listaZaOdstrel = new ArrayList<>();
+            for (Menadzer menadzer:
+                    menadzerList) {
+                listaZaOdstrel.add(menadzer);
+            }
+
+            List<Menadzer> finalnaLista = new ArrayList<>();
+            for (Menadzer menadzer: listaZaOdstrel) {
+                if (menadzer.getRestoran() == null) {
+                    finalnaLista.add(menadzer);
+                }
+            }
+
+            // todo preko MenadzerDTO, mrzi me sada
+
+            return new ResponseEntity(finalnaLista, HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
 
 }

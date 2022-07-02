@@ -41,4 +41,8 @@ public class MenadzerService {
 
         return null;
     }
+
+    public List<Menadzer> findAll() {
+        return menadzerRepository.findAll();
+    }
 }
