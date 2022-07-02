@@ -30,4 +30,15 @@ public class MenadzerService {
 
         return false;
     }
+
+    public Menadzer menadzerKonkretnogRestorana(Restoran restoran) {
+        List<Menadzer> menadzerList = menadzerRepository.findAll();
+
+        for (Menadzer menadzer : menadzerList) {
+            if (menadzer.getRestoran() == restoran)
+                return menadzer;
+        }
+
+        return null;
+    }
 }

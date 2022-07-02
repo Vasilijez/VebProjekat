@@ -3,6 +3,7 @@ package vezbe.demo.controllers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.*;
@@ -94,7 +95,8 @@ public class KorisnikController {
         return errorDic;
     }
 
-    @GetMapping("admin")
+    @GetMapping(value = "admin",
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity pregledKorisnikaAdmina(HttpSession session) {
         if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
             List<KorisnikDto> listaKorisnikaDto = new ArrayList<>();
@@ -124,7 +126,10 @@ public class KorisnikController {
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("dodaj-menadzera")
+    @PostMapping(
+    value = "dodaj-menadzera",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity dodajMenadzera(@RequestBody Menadzer menadzer, HttpSession session) {
         if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
             HashMap<String, String> errorDic = Validate(menadzer);
@@ -140,7 +145,10 @@ public class KorisnikController {
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
 
-    @PostMapping("dodaj-dostavljaca")
+    @PostMapping(
+            value = "dodaj-dostavljaca",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity dodajDostavljaca(@RequestBody Dostavljac dostavljac, HttpSession session) {
         if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
             HashMap<String, String> errorDic = Validate(dostavljac);
@@ -175,7 +183,10 @@ public class KorisnikController {
         return errorDic;
     }
 
-    @PostMapping("dodaj-restoran")
+    @PostMapping(
+    value = "dodaj-restoran",
+    consumes = MediaType.APPLICATION_JSON_VALUE,
+    produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity dodajRestoran(@RequestBody RestoranDto restoranDto, HttpSession session) {
         if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
             HashMap<String, String> errorDic = ValidateRestoran(restoranDto);
@@ -183,8 +194,9 @@ public class KorisnikController {
             if (!errorDic.isEmpty()){
                 return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
             }
-
-            Restoran restoran = new Restoran(restoranDto.getNaziv(), restoranDto.getTipRestorana(), null, restoranDto.getLokacija());
+            Lokacija lokacija = restoranDto.getLokacija();
+            lokacijaService.save(lokacija);
+            Restoran restoran = new Restoran(restoranDto.getNaziv(), restoranDto.getTipRestorana(), null, lokacija);
             restoranService.save(restoran);
 
             return new ResponseEntity("Uspesno dodat restoran", HttpStatus.OK);

@@ -43,6 +43,11 @@ public class RestoranService {
         return restoranRepository.save(restoran);
     }
 
+    public void delete(Restoran restoran) {
+        restoranRepository.delete(restoran);
+    }
+
+
     public Restoran findByNaziv(String naziv) {
         return restoranRepository.findByNaziv(naziv);
     }

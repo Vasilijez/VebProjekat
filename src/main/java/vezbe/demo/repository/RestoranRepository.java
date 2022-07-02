@@ -22,4 +22,6 @@ public interface RestoranRepository extends JpaRepository<Restoran, Long> {
 
     Optional<Restoran> findById(Long id);
 
+    void delete(Restoran restoran);
+
 }

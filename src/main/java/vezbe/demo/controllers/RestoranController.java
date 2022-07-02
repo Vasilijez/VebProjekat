@@ -2,10 +2,12 @@ package vezbe.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.ArtikalDto;
 import vezbe.demo.dto.RestoranDto;
+import vezbe.demo.dto.RestoranNazivDto;
 import vezbe.demo.dto.RestoranPojedinacniDto;
 import vezbe.demo.model.*;
 import vezbe.demo.service.*;
@@ -32,8 +34,21 @@ public class RestoranController {
     @Autowired
     KorisnikService korisnikService;
 
+    @Autowired
+    MenadzerService menadzerService;
 
-    @GetMapping("restorani")
+    @Autowired
+    PorudzbinaService porudzbinaService;
+
+    @Autowired
+    KupacService kupacService;
+
+    @Autowired
+    DostavljacService dostavljacService;
+
+    @GetMapping(
+    value = "/restorani",
+    produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RestoranDto> prikazRestorana() {
         List<Restoran> listaRestoran = restoranService.findAll();
         List<RestoranDto> restoranDtoList = new ArrayList<>();
@@ -248,6 +263,64 @@ public class RestoranController {
             }
 
             return new ResponseEntity("Artikal ne pripada restoranu", HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+    @PostMapping(
+    value = "obrisi-restoran")
+    public ResponseEntity obrisiRestoran(@RequestBody RestoranNazivDto restoranNazivDto, HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            Restoran restoran = restoranService.findByNaziv(restoranNazivDto.getNaziv()); // naziv je 100% ispravan, jer ga uzimamo iz baze
+            List<Komentar> komentarList = komentarService.findAllByRestoran(restoran);
+
+            Menadzer menadzer = menadzerService.menadzerKonkretnogRestorana(restoran);
+            menadzer.setRestoran(null);
+
+
+
+            List<Kupac> kupacList = kupacService.findAll();
+            List<Porudzbina> tmp = new ArrayList<>();
+            for (Kupac kupac:kupacList) {
+                for (Porudzbina porudzbina: kupac.getIstorija_porudzbina()) {
+                    if (porudzbina.getRestoran() == restoran) {
+                        tmp.add(porudzbina);
+                        //kupac.getIstorija_porudzbina().remove(porudzbina);
+                    }
+                }
+                for (Porudzbina porudzbina: tmp) {
+                    kupac.getIstorija_porudzbina().remove(porudzbina);
+                }
+            }
+
+
+
+            List<Dostavljac> dostavljacList = dostavljacService.findAll();
+            List<Porudzbina> tmp2 = new ArrayList<>();
+            for (Dostavljac dostavljac:dostavljacList) {
+                for (Porudzbina porudzbina: dostavljac.getPorudzbine()) {
+                    if (porudzbina.getRestoran() == restoran) {
+                        tmp2.add(porudzbina);
+                        //dostavljac.getPorudzbine().remove(porudzbina);
+                    }
+                }
+                for (Porudzbina porudzbina: tmp) {
+                    dostavljac.getPorudzbine().remove(porudzbina);
+                }
+            }
+
+            List<Porudzbina> porudzbinaList = porudzbinaService.findAllByRestoran(restoran);
+            for (Porudzbina porudzbina:porudzbinaList) {
+                porudzbinaService.delete(porudzbina);
+            }
+
+            for (Komentar komentar:komentarList) {
+                komentarService.delete(komentar);
+            }
+            restoranService.delete(restoran);
+
+            return new ResponseEntity("Uspesno obrisan restoran", HttpStatus.OK);
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }

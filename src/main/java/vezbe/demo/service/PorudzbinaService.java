@@ -18,5 +18,9 @@ public class PorudzbinaService {
         return porudzbinaRepository.findAllByRestoran(restoran);
     }
 
+    public void delete(Porudzbina porudzbina) {
+        porudzbinaRepository.delete(porudzbina);
+    }
+
 
 }
