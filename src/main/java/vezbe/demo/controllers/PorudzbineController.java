@@ -160,7 +160,7 @@ public class PorudzbineController {
         return ResponseEntity.ok("Uspesno ste izbacili artikal iz korpe");
     }
 
-    @GetMapping("pregledKorpe") //RADI
+    @GetMapping("pregledKorpe")
     public ResponseEntity<KorpaDto> pregledKorpe(HttpSession session) {
 
         Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");

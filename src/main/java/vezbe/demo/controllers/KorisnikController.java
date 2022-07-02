@@ -109,6 +109,63 @@ public class KorisnikController {
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
 
+    @GetMapping("pretrazi-po-imenu/{ime}")
+    public ResponseEntity pretragaKorisnikaPoImenu(@PathVariable("ime") String ime, HttpSession session){
+
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+            List<KorisnikDto> listaKorisnikaDto = new ArrayList<>();
+            List<Korisnik> listaKorisnika = korisnikService.findAll();
+
+            for (Korisnik k : listaKorisnika) {
+                if(k.getIme().equals(ime)){
+                    KorisnikDto korisnikDto = new KorisnikDto(k);
+                    listaKorisnikaDto.add(korisnikDto);
+                }
+            }
+
+            return new ResponseEntity(listaKorisnikaDto, HttpStatus.OK);
+        }else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("pretrazi-po-prezimenu/{prezime}")
+    public ResponseEntity pretragaKorisnikaPoPrezimenu(@PathVariable("prezime") String prezime, HttpSession session){
+
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+            List<KorisnikDto> listaKorisnikaDto = new ArrayList<>();
+            List<Korisnik> listaKorisnika = korisnikService.findAll();
+
+            for (Korisnik k : listaKorisnika) {
+                if(k.getPrezime().equals(prezime)){
+                    KorisnikDto korisnikDto = new KorisnikDto(k);
+                    listaKorisnikaDto.add(korisnikDto);
+                }
+            }
+
+            return new ResponseEntity(listaKorisnikaDto, HttpStatus.OK);
+        }else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping("pretrazi-po-korisnickom -imenu/{korisnicko_ime}")
+    public ResponseEntity pretragaKorisnikaPoKorisnickomImenu(@PathVariable("korisnicko_ime") String korisnickoIme, HttpSession session){
+
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+            List<KorisnikDto> listaKorisnikaDto = new ArrayList<>();
+            List<Korisnik> listaKorisnika = korisnikService.findAll();
+
+            for (Korisnik k : listaKorisnika) {
+                if(k.getKorisnickoIme().equals(korisnickoIme)){
+                    KorisnikDto korisnikDto = new KorisnikDto(k);
+                    listaKorisnikaDto.add(korisnikDto);
+                }
+            }
+
+            return new ResponseEntity(listaKorisnikaDto, HttpStatus.OK);
+        }else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
     @GetMapping("menadzer")
     public ResponseEntity pregledKorisnikaMenadzera(HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
@@ -187,6 +244,20 @@ public class KorisnikController {
             restoranService.save(restoran);
 
             return new ResponseEntity("Uspesno dodat restoran", HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+
+    }
+
+    @PostMapping("obrisi-restoran/{id}")
+    public ResponseEntity obrisiRestoran(@PathVariable("id") Long restoranId, HttpSession session){
+
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            Restoran restoran = restoranService.findRestoranById(restoranId);
+            restoranService.obrisi(restoran);
+
+            return new ResponseEntity("Uspesno obrisan restoran!", HttpStatus.OK);
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
 
