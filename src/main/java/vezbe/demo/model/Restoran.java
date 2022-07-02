@@ -79,13 +79,9 @@ public class Restoran implements Serializable {
         this.lokacija = lokacija;
     }
 
-    public Set<Komentar> getKomentari() {
-        return komentari;
-    }
+    public Set<Komentar> getKomentari() { return komentari; }
 
-    public void setKomentari(Set<Komentar> komentari) {
-        this.komentari = komentari;
-    }
+    public void setKomentari(Set<Komentar> komentari) { this.komentari = komentari;}
 
     public void dodajKomentar(Komentar komentar){
         komentari.add(komentar);

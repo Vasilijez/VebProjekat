@@ -13,10 +13,7 @@ import vezbe.demo.service.PorudzbinaService;
 import vezbe.demo.service.SessionService;
 
 import javax.servlet.http.HttpSession;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RequestMapping("api")
 @RestController
@@ -202,8 +199,15 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Menadzer)
             return new ResponseEntity("Ova funkcionalnost je dozvoljena samo menadzerima!", HttpStatus.BAD_REQUEST);
 
-        if(porudzbinaService.findById(id) == null)
-            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        HashMap<String, String> errorDic = new HashMap<>();
+
+        try{
+            Porudzbina porudzbina = porudzbinaService.findById(id);
+            if(porudzbina == null)
+                return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
+        }
 
         Menadzer ulogovaniMenadzer = (Menadzer) ulogovani;
 
@@ -226,8 +230,15 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Menadzer)
             return new ResponseEntity("Ova funkcionalnost je dozvoljena samo menadzerima!", HttpStatus.BAD_REQUEST);
 
-        if(porudzbinaService.findById(id) == null)
-            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        HashMap<String, String> errorDic = new HashMap<>();
+
+        try{
+            Porudzbina porudzbina = porudzbinaService.findById(id);
+            if(porudzbina == null)
+                return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
+        }
 
         Menadzer ulogovaniMenadzer = (Menadzer) ulogovani;
 
@@ -250,8 +261,15 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Dostavljac)
             return new ResponseEntity("Ova funkcionalnost je dozvoljena samo dostavljacima!", HttpStatus.BAD_REQUEST);
 
-        if(porudzbinaService.findById(id) == null)
-            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        HashMap<String, String> errorDic = new HashMap<>();
+
+        try{
+            Porudzbina porudzbina = porudzbinaService.findById(id);
+            if(porudzbina == null)
+                return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
+        }
 
         Dostavljac ulogovaniDostavljac = (Dostavljac) ulogovani;
 
@@ -273,8 +291,15 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Dostavljac)
             return new ResponseEntity("Ova funkcionalnost je dozvoljena samo dostavljacima!", HttpStatus.BAD_REQUEST);
 
-        if(porudzbinaService.findById(id) == null)
-            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        HashMap<String, String> errorDic = new HashMap<>();
+
+        try{
+            Porudzbina porudzbina = porudzbinaService.findById(id);
+            if(porudzbina == null)
+                return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
+        }
 
         Dostavljac ulogovaniDostavljac = (Dostavljac) ulogovani;
 
@@ -296,14 +321,21 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
             return new ResponseEntity("Ova funkcionalnost je dozvoljena samo kupcima!", HttpStatus.BAD_REQUEST);
 
-        if(porudzbinaService.findById(id) == null)
-            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        HashMap<String, String> errorDic = new HashMap<>();
 
-        if(porudzbinaService.findById(id).getStatus() == Porudzbina.Status.dostavljena)
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+            if(porudzbina == null)
+                return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+        }catch(Exception e){
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
+        }
+
+        if(porudzbina.getStatus() == Porudzbina.Status.dostavljena)
             return new ResponseEntity("Ostavljanje komentara je dozvoljeno samo ako je porudzbina dostavljena!", HttpStatus.BAD_REQUEST);
 
-        Porudzbina p = porudzbinaService.findById(id);
-        Restoran restoran = p.getRestoran();
+        Restoran restoran = porudzbina.getRestoran();
 
         Komentar komentar = new Komentar();
 
@@ -315,13 +347,14 @@ public class PorudzbineController {
         else
             komentar.setTekst_komentara(komentarDto.getTekst());
 
-        if(komentarDto.getOcena() == null)
-            return new ResponseEntity("Niste uneli ocenu!", HttpStatus.BAD_REQUEST);
+        if((komentarDto.getOcena()<1) || (komentarDto.getOcena()>5)) //ocena je od 1 do 5, default vrednost ocene je 0
+            return new ResponseEntity("Niste uneli odgovorajucu ocenu!", HttpStatus.BAD_REQUEST);
         else
             komentar.setOcena(komentarDto.getOcena());
 
         restoran.dodajKomentar(komentar);
 
+        return new ResponseEntity<>("Uspesno dodat komentar!", HttpStatus.OK);
     }
 
 }

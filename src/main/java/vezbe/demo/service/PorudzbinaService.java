@@ -8,10 +8,7 @@ import vezbe.demo.model.*;
 import vezbe.demo.repository.ArtikalUPorudzbiniRepository;
 import vezbe.demo.repository.PorudzbinaRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PorudzbinaService {
@@ -150,10 +147,13 @@ public class PorudzbinaService {
     public String UPripremi(UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.obrada)) {
@@ -171,10 +171,13 @@ public class PorudzbinaService {
     public String CekaDostavljaca(UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.u_pripremi)) {
@@ -192,10 +195,13 @@ public class PorudzbinaService {
     public String UTransportu(UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.ceka_dostavljaca)) {
@@ -213,10 +219,13 @@ public class PorudzbinaService {
     public String Dostavljena(UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.u_transportu)) {
@@ -237,10 +246,13 @@ public class PorudzbinaService {
     public boolean MenadzerOfPorudzbina(Menadzer menadzer, UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(porudzbina.getRestoran().getId().equals(menadzer.getRestoran().getId()))
@@ -252,10 +264,13 @@ public class PorudzbinaService {
     public boolean DostavljacOfPorudzbina(Dostavljac dostavljac, UUID id) {
 
         Porudzbina porudzbina = new Porudzbina();
+
+        HashMap<String, String> errorDic = new HashMap<>();
+
         try{
             porudzbina = porudzbinaService.findById(id);
         }catch(Exception e){
-            //STA NAPISATI?
+            errorDic.put("Porudzbina", "Greska prilikom pretrage porudzbine!");
         }
 
         if(dostavljac.getPorudzbine().contains(porudzbina))
