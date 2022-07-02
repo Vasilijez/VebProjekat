@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import vezbe.demo.dto.KomentarDto;
 import vezbe.demo.dto.KorpaDto;
 import vezbe.demo.model.*;
 import vezbe.demo.service.ArtikalService;
@@ -12,6 +13,7 @@ import vezbe.demo.service.PorudzbinaService;
 import vezbe.demo.service.SessionService;
 
 import javax.servlet.http.HttpSession;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -28,6 +30,9 @@ public class PorudzbineController {
 
     @Autowired
     PorudzbinaService porudzbinaService;
+
+    @Autowired
+    KomentarDto komentarDto;
 
     @GetMapping("porudzbine")
     public ResponseEntity pregledPorudzbina(HttpSession session) {
@@ -278,6 +283,45 @@ public class PorudzbineController {
         }
 
         return ResponseEntity.ok(porudzbinaService.Dostavljena(id));
+    }
+
+    @PutMapping("dodajKomentar/{id}")
+    public ResponseEntity<String> dodajKomentar(@PathVariable UUID id, HttpSession session){
+
+        Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
+
+        if (ulogovani == null)
+            return new ResponseEntity("Niste ulogovani!", HttpStatus.BAD_REQUEST);
+
+        if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
+            return new ResponseEntity("Ova funkcionalnost je dozvoljena samo kupcima!", HttpStatus.BAD_REQUEST);
+
+        if(porudzbinaService.findById(id) == null)
+            return new ResponseEntity("Porudzbina sa datim UUID-om ne postoji!", HttpStatus.BAD_REQUEST);
+
+        if(porudzbinaService.findById(id).getStatus() == Porudzbina.Status.dostavljena)
+            return new ResponseEntity("Ostavljanje komentara je dozvoljeno samo ako je porudzbina dostavljena!", HttpStatus.BAD_REQUEST);
+
+        Porudzbina p = porudzbinaService.findById(id);
+        Restoran restoran = p.getRestoran();
+
+        Komentar komentar = new Komentar();
+
+        if(komentarDto.getRestoran() != restoran)
+            return new ResponseEntity("Nije moguce uneti komentar za restoran koji nije vezan za datu porudzbinu!", HttpStatus.BAD_REQUEST);
+
+        if(komentarDto.getTekst().isEmpty())
+            return new ResponseEntity("Niste uneli tekst komentara!", HttpStatus.BAD_REQUEST);
+        else
+            komentar.setTekst_komentara(komentarDto.getTekst());
+
+        if(komentarDto.getOcena() == null)
+            return new ResponseEntity("Niste uneli ocenu!", HttpStatus.BAD_REQUEST);
+        else
+            komentar.setOcena(komentarDto.getOcena());
+
+        restoran.dodajKomentar(komentar);
+
     }
 
 }

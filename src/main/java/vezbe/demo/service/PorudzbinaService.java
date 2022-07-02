@@ -31,6 +31,12 @@ public class PorudzbinaService {
     @Autowired
     ArtikalUPorudzbiniService artikalUPorudzbiniService;
 
+    @Autowired
+    PorudzbinaService porudzbinaService;
+
+    @Autowired
+    KupacService kupacService;
+
     public List<Porudzbina> findAllByRestoran(Restoran restoran) {
         return porudzbinaRepository.findAllByRestoran(restoran);
     }
@@ -43,7 +49,9 @@ public class PorudzbinaService {
         porudzbinaRepository.save(porudzbina);
     }
 
-    public Porudzbina findById(UUID id) { return porudzbinaRepository.findById(id).get(); }
+    public Porudzbina findById(UUID id) throws Exception{
+        return porudzbinaRepository.findById(id).get();
+    }
 
     public boolean ArtikaluRestoranu(Long id1, Long id2){
         return restoranService.ArtikaluRestoranu(id1, id2);
@@ -55,9 +63,7 @@ public class PorudzbinaService {
 
     public void saveArtikalUPorudzbini(ArtikalUPorudzbini ap){ artikalUPorudzbiniRepository.save(ap); }
 
-    public void saveKupac(Kupac kupac){
-        KupacService.save(kupac);
-    }
+    public void saveKupac(Kupac kupac){ kupacService.save(kupac); }
 
     public Boolean ArtikalUKorpi(Kupac kupac, Long id) {
 
@@ -143,11 +149,16 @@ public class PorudzbinaService {
 
     public String UPripremi(UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.obrada)) {
 
-            porudzbina.setStatus((Porudzbina.Status.u_pripremi);
+            porudzbina.setStatus(Porudzbina.Status.u_pripremi);
             save(porudzbina);
 
             return "Uspesno izmenjeno stanje korpe iz obrada u u pripremi!";
@@ -159,7 +170,12 @@ public class PorudzbinaService {
 
     public String CekaDostavljaca(UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.u_pripremi)) {
 
@@ -175,7 +191,12 @@ public class PorudzbinaService {
 
     public String UTransportu(UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.ceka_dostavljaca)) {
 
@@ -191,7 +212,12 @@ public class PorudzbinaService {
 
     public String Dostavljena(UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(porudzbina.getStatus().equals(Porudzbina.Status.u_transportu)) {
 
@@ -199,7 +225,7 @@ public class PorudzbinaService {
             save(porudzbina);
             Kupac kupac = porudzbina.getKupac();
 
-            kupac.setBroj_bodova((kupac.getBroj_bodova() + porudzbina.getCena()/1000*133));
+            kupac.setBroj_bodova((kupac.getBroj_bodova() + (int)porudzbina.getCena()/1000*133));
             saveKupac(kupac);
             return "Uspesno izmenjeno stanje porudzbine iz u transportu u dostavljena!";
         }
@@ -210,7 +236,12 @@ public class PorudzbinaService {
 
     public boolean MenadzerOfPorudzbina(Menadzer menadzer, UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(porudzbina.getRestoran().getId().equals(menadzer.getRestoran().getId()))
             return true;
@@ -220,13 +251,19 @@ public class PorudzbinaService {
 
     public boolean DostavljacOfPorudzbina(Dostavljac dostavljac, UUID id) {
 
-        Porudzbina porudzbina = findById(id);
+        Porudzbina porudzbina = new Porudzbina();
+        try{
+            porudzbina = porudzbinaService.findById(id);
+        }catch(Exception e){
+            //STA NAPISATI?
+        }
 
         if(dostavljac.getPorudzbine().contains(porudzbina))
             return true;
 
         return false;
     }
+
 
 
 }

@@ -4,7 +4,7 @@ import java.util.*;
 
 public class KorpaDto {
 
-    private List<ArtikalUKorpiDto> artikli = new List<ArtikalUKorpiDto>() {};
+    private List<ArtikalUKorpiDto> artikli = new ArrayList<ArtikalUKorpiDto>() {};
     private double ukupnaCena;
 
     public KorpaDto(List<ArtikalUKorpiDto> artikli, double ukupnaCena) {
