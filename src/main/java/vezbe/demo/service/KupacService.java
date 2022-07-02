@@ -40,4 +40,8 @@ public class KupacService {
 
         return kupac;
     }
+
+    public void save(Kupac kupac){
+        kupacRepository.save(kupac);
+    }
 }

@@ -57,6 +57,18 @@ public class Kupac extends Korisnik implements Serializable {
         this.tip = tip;
     }
 
+    public void dodajPorudzbinu(Porudzbina porudzbina) {
+        this.istorija_porudzbina.add(porudzbina);
+    }
+
+    public Porudzbina korpa() {
+        for(Porudzbina p : istorija_porudzbina) {
+            if (p.getStatus().equals(Porudzbina.Status.u_korpi))
+                return p;
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return super.toString() + "Kupac{" +

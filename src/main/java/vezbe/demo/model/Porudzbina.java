@@ -26,6 +26,7 @@ public class Porudzbina implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private Kupac kupac;
     public enum Status {
+        u_korpi,
         obrada,
         u_pripremi,
         ceka_dostavljaca,
@@ -35,6 +36,9 @@ public class Porudzbina implements Serializable {
     }
     @Column
     private Status status;
+
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<ArtikalUPorudzbini> artikliUPorudzbini = new HashSet<>();
 
     public Porudzbina() {
     }
@@ -99,6 +103,14 @@ public class Porudzbina implements Serializable {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Set<ArtikalUPorudzbini> getArtikliUPorudzbini() {
+        return artikliUPorudzbini;
+    }
+
+    public void setArtikliUPorudzbini(Set<ArtikalUPorudzbini> artikliUPorudzbini) {
+        this.artikliUPorudzbini = artikliUPorudzbini;
     }
 
     @Override
