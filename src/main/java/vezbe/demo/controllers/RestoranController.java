@@ -182,7 +182,7 @@ public class RestoranController {
         return restoranDtoList;
     }
 
-    @GetMapping("/restoran/{restoranID}")
+    @GetMapping("/restoran/id/{restoranID}")
     public ResponseEntity izaberiRestoran(@PathVariable("restoranID") Long restoranID) {
 
         Restoran restoran;
@@ -227,6 +227,7 @@ public class RestoranController {
 
         return new ResponseEntity(restoranPojedinacniDto, HttpStatus.OK);
     }
+
 
     @GetMapping(
             value = "/artikal/{id}",

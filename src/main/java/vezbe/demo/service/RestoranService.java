@@ -2,6 +2,7 @@ package vezbe.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vezbe.demo.model.Artikal;
 import vezbe.demo.model.Lokacija;
 import vezbe.demo.model.Restoran;
 import vezbe.demo.repository.RestoranRepository;
@@ -98,6 +99,29 @@ public class RestoranService {
 
     public Restoran nadjiRestoran(Long id) throws Exception {
         return restoranRepository.findById(id).get();
+    }
+
+    public void obrisi(Restoran restoran) { restoranRepository.delete(restoran);}
+
+    public Restoran findRestoranById(Long id) {
+        List<Restoran> restorani = restoranRepository.findAll();
+
+        for (Restoran r : restorani) {
+            if (r.getId().equals(id)) { return r; }
+        }
+
+        return null;
+    }
+
+    public boolean ArtikaluRestoranu(Long idR, Long idA) {
+        Restoran restoran = findRestoranById(idR);
+
+        for (Artikal a : restoran.getArtikli()) {
+            if(a.getId().equals(idA)){
+                return true;
+            }
+        }
+        return false;
     }
 
 

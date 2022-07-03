@@ -28,6 +28,10 @@ public class Restoran implements Serializable {
     @OneToOne(fetch = FetchType.EAGER)
     private Lokacija lokacija;
 
+    @Column
+    @ManyToMany(fetch = FetchType.LAZY) // dodao
+    private Set<Komentar> komentari = new HashSet<>();
+
     public Restoran() {
     }
 
@@ -77,6 +81,11 @@ public class Restoran implements Serializable {
     public void setLokacija(Lokacija lokacija) {
         this.lokacija = lokacija;
     }
+
+    public void dodajKomentar(Komentar komentar){
+        komentari.add(komentar);
+    }
+
 
     @Override
     public String toString() {
