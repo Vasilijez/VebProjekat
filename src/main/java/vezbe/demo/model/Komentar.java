@@ -18,7 +18,7 @@ public class Komentar implements Serializable {
     private Kupac kupac;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Restoran restoran;
     @Column
     private String tekst_komentara;

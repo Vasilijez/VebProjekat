@@ -1,0 +1,183 @@
+<template>
+
+<link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Navbar</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Početna</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Odjavi se</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="form-group pull-right">
+    <input type="text" class="search form-control" placeholder="Koji restoran tražite?">
+</div>
+<span class="counter pull-right"></span>
+<table class="table table-hover table-bordered results">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th class="col-md-2 col-xs-3">Naziv restorana</th>
+      <th class="col-md-2 col-xs-3">Tip restorana</th>
+      <th class="col-md-2 col-xs-3">Adresa</th>
+      <th class="col-md-2 col-xs-3">Geografska širina</th>
+      <th class="col-md-2 col-xs-3">Geografska dužina</th>
+      <th class="col-md-1 col-xs-3">Obriši</th>
+    </tr>
+    <tr class="warning no-result">
+      <td colspan="4"><i class="fa fa-warning"></i> No result</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr  v-for="(restoran,i) in restorani" :key="i">
+            <th scope="row">{{i}}</th>
+            <td>{{restoran.naziv}}</td>
+            <td>{{restoran.tipRestorana}}</td>
+            <td>{{restoran.lokacija.adresa}}</td>
+            <td>{{restoran.lokacija.sirina}}</td>
+            <td>{{restoran.lokacija.duzina}}</td>
+            <td><button @click="deleteEmployee(restoran.naziv)" type="button" class="btn btn-danger"><i class="bi bi-trash text-light"></i> Obriši</button></td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+    <br>
+    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
+    <br>
+    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
+    <br>
+    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
+    <br>
+    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
+    <br>
+    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/izaberi-menadzera')">Izaberi menadžera</button>
+
+
+
+
+</template>
+
+
+
+<script>
+import axios from "axios";
+import $ from 'jquery';
+export default {
+    name: "AdminView",
+    data: function () {
+        return {
+            restorani: [],
+            restoran_naziv: {
+              naziv: ""
+            }
+        };
+    },
+    mounted: function () {
+    
+    $(document).ready(function() {
+  $(".search").keyup(function () {
+    var searchTerm = $(".search").val();
+    var listItem = $('.results tbody').children('tr');
+    var searchSplit = searchTerm.replace(/ /g, "'):containsi('")
+    
+  $.extend($.expr[':'], {'containsi': function(elem, i, match, array){
+        return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+    }
+  });
+    
+  $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','false');
+  });
+
+  $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+    $(this).attr('visible','true');
+  });
+
+  var jobCount = $('.results tbody tr[visible="true"]').length;
+    $('.counter').text(jobCount + ' item');
+
+  if(jobCount == '0') {$('.no-result').show();}
+    else {$('.no-result').hide();}
+		  });
+});
+
+    axios
+      .get("http://localhost:8081/api/restorani", {withCredentials:'include'})
+      .then((res) => {
+        console.log(res)
+        this.restorani = res.data
+      })
+      .catch((err) =>{ // todo neovlascen pristup
+        console.log(err)
+      })
+
+  
+    },
+    methods: {
+        deleteEmployee: function (naziv) {
+          this.restoran_naziv.naziv = naziv;
+          console.log(this.restoran_naziv)
+        axios
+            .post("http://localhost:8081/api/obrisi-restoran", this.restoran_naziv, {withCredentials: true})
+            .then(res => {
+                console.log(res)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.log(error)
+            }); 
+        }
+      
+    }
+
+}
+   
+</script>
+
+<style>
+
+body{
+  padding:20px 20px;
+}
+
+.results tr[visible='false'],
+.no-result{
+  display:none;
+}
+
+.results tr[visible='true']{
+  display:table-row;
+}
+
+.counter{
+  padding:8px; 
+  color:#ccc;
+}
+
+.btn btn-primary {
+ margin-right: 4px;
+}
+</style>

@@ -1,0 +1,59 @@
+package vezbe.demo.model;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+public class ArtikalUPorudzbini implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "artikal_id")
+    private Artikal artikal;
+
+    private int kolicina;
+
+    public ArtikalUPorudzbini() {
+    }
+
+    public ArtikalUPorudzbini(Artikal artikal, int kolicina) {
+        this.artikal = artikal;
+        this.kolicina = kolicina;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Artikal getArtikal() {
+        return artikal;
+    }
+
+    public void setArtikal(Artikal artikal) {
+        this.artikal = artikal;
+    }
+
+    public int getKolicina() {
+        return kolicina;
+    }
+
+    public void setKolicina(int kolicina) {
+        this.kolicina = kolicina;
+    }
+
+    @Override
+    public String toString() {
+        return "ArtikalUPorudzbini{" +
+                "id=" + id +
+                ", artikal=" + artikal +
+                ", kolicina=" + kolicina +
+                '}';
+    }
+}

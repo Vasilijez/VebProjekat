@@ -2,10 +2,12 @@ package vezbe.demo.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.ArtikalDto;
 import vezbe.demo.dto.RestoranDto;
+import vezbe.demo.dto.RestoranNazivDto;
 import vezbe.demo.dto.RestoranPojedinacniDto;
 import vezbe.demo.model.*;
 import vezbe.demo.service.*;
@@ -32,8 +34,21 @@ public class RestoranController {
     @Autowired
     KorisnikService korisnikService;
 
+    @Autowired
+    MenadzerService menadzerService;
 
-    @GetMapping("restorani")
+    @Autowired
+    PorudzbinaService porudzbinaService;
+
+    @Autowired
+    KupacService kupacService;
+
+    @Autowired
+    DostavljacService dostavljacService;
+
+    @GetMapping(
+    value = "/restorani",
+    produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RestoranDto> prikazRestorana() {
         List<Restoran> listaRestoran = restoranService.findAll();
         List<RestoranDto> restoranDtoList = new ArrayList<>();
@@ -45,6 +60,42 @@ public class RestoranController {
 
         return restoranDtoList;
     }
+
+    @GetMapping(
+            value = "/restorani-bez-menadzera",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity prikazRestoranaBezMenadzera(HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            List<Restoran> listaRestoran = restoranService.findAll();
+            List<RestoranDto> restoranDtoList = new ArrayList<>();
+
+            List<Menadzer> menadzerList = menadzerService.findAll();
+            List<Restoran> finalnaLista = new ArrayList<>();
+            for (Restoran restoran : listaRestoran) {
+                finalnaLista.add(restoran);
+            }
+
+            for (Restoran restoran:
+                    listaRestoran) {
+                for (Menadzer menadzer : menadzerList) {
+                    if (menadzer.getRestoran() == restoran) {
+                        finalnaLista.remove(restoran);
+                        break;
+                    }
+                }
+            }
+
+            for (Restoran restoran : finalnaLista) {
+                RestoranDto restoranDto = new RestoranDto(restoran.getNaziv(), restoran.getTipRestorana(), restoran.getLokacija());
+                restoranDtoList.add(restoranDto);
+            }
+
+            return new ResponseEntity(restoranDtoList, HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
 
     @GetMapping("search/naziv/{naziv}") // ok
     public List<RestoranDto> search(@PathVariable("naziv") String naziv) {
@@ -131,7 +182,7 @@ public class RestoranController {
         return restoranDtoList;
     }
 
-    @GetMapping("/restoran/{restoranID}")
+    @GetMapping("/restoran/id/{restoranID}")
     public ResponseEntity izaberiRestoran(@PathVariable("restoranID") Long restoranID) {
 
         Restoran restoran;
@@ -151,6 +202,52 @@ public class RestoranController {
         return new ResponseEntity(restoranPojedinacniDto, HttpStatus.OK);
     }
 
+    @GetMapping(
+        value = "/restoran/{naziv}",
+        /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity izaberiRestoranNazivom(@PathVariable("naziv") String naziv) {
+
+        Restoran restoran;
+
+
+        try {
+            restoran = restoranService.findByNaziv(naziv);
+        } catch (Exception e) {
+
+            return new ResponseEntity("Neispravan naziv", HttpStatus.BAD_REQUEST);
+        }
+
+        RestoranPojedinacniDto restoranPojedinacniDto = new RestoranPojedinacniDto(restoran);
+
+        restoranPojedinacniDto.setKomentari(komentarService.findAllByRestoran(restoran));
+        restoranPojedinacniDto.setProsecnaOcena(komentarService.averageMark(restoran));
+        restoranPojedinacniDto.setStatus(RestoranPojedinacniDto.Status.RADI);
+
+
+        return new ResponseEntity(restoranPojedinacniDto, HttpStatus.OK);
+    }
+
+
+    @GetMapping(
+            value = "/artikal/{id}",
+            /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity pronadjiArtikal(@PathVariable("id") Long id) {
+
+        Artikal artikal;
+
+        try {
+            artikal = artikalService.nadjiArtikal(id);
+        } catch (Exception e) {
+            return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
+        }
+        // todo dto, mrzi me
+        return new ResponseEntity(artikal, HttpStatus.OK);
+    }
+
+
+
     @PostMapping("/restoran/dodaj-artikal")
     public ResponseEntity dodajArtikal(@RequestBody ArtikalDto artikalDto, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
@@ -162,6 +259,11 @@ public class RestoranController {
 
             Artikal artikal = new Artikal(artikalDto.getNaziv(), artikalDto.getCena(), artikalDto.getTip(), artikalDto.getKolicina(), artikalDto.getOpis());
             artikalService.save(artikal);
+
+            Menadzer menadzer = (Menadzer) korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session));
+            Restoran restoran = menadzer.getRestoran();
+            restoran.getArtikli().add(artikal);
+            restoranService.save(restoran);
 
             return new ResponseEntity("Uspesno dodat artikal", HttpStatus.OK);
         } else
@@ -187,15 +289,20 @@ public class RestoranController {
         return errorDic;
     }
 
-    @PutMapping("/restoran/izmeni-artikal/{id}")
+    @PutMapping(
+        value = "/restoran/izmeni-artikal/{id}",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity izmeniArtikal(@RequestBody ArtikalDto artikalDto, @PathVariable Long id, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
             HashMap<String, String> errorDic = ValidateArtikalPriMenjanju(artikalDto);
 
+
+            System.out.println("stigao");
             if (!errorDic.isEmpty()){
                 return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
             }
-
+            System.out.println("stigao2");
             Artikal artikal;
             try {
                 artikal = artikalService.nadjiArtikal(id);
@@ -203,6 +310,7 @@ public class RestoranController {
                 return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
             }
 
+            System.out.println("stigao3");
             artikalService.azuriraj(artikalDto, artikal);
 
             return new ResponseEntity("Uspesno azuriran artikal", HttpStatus.OK);
@@ -215,8 +323,8 @@ public class RestoranController {
 
         if (artikalDto.getNaziv() != null && (artikalDto.getNaziv().isEmpty() || artikalDto.getNaziv().length()>25))
             errorDic.put("Naziv", "Polje naziv je neispravno uneseno");
-        if (artikalDto.getNaziv() != null && (artikalService.CheckNazivAgainst(artikalDto.getNaziv())))
-            errorDic.put("Naziv", "Naziv artikla vec postoji, unesite drugi");
+        /*if (artikalDto.getNaziv() != null && (artikalService.CheckNazivAgainst(artikalDto.getNaziv())))
+            errorDic.put("Naziv", "Naziv artikla vec postoji, unesite drugi");*/
         if (artikalDto.getCena() <= 0)
             errorDic.put("Cena", "Polje cena je neispravno uneseno");
         // ostaje provera za sliku da se odradi
@@ -227,7 +335,10 @@ public class RestoranController {
         return errorDic;
     }
 
-    @GetMapping("/restoran/obrisi-artikal/{id}")
+    @GetMapping(
+        value = "/restoran/obrisi-artikal/{id}",
+        /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity obrisiArtikal(@PathVariable Long id, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
 
@@ -248,6 +359,65 @@ public class RestoranController {
             }
 
             return new ResponseEntity("Artikal ne pripada restoranu", HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+
+    @PostMapping(
+    value = "obrisi-restoran")
+    public ResponseEntity obrisiRestoran(@RequestBody RestoranNazivDto restoranNazivDto, HttpSession session) {
+        if (sessionService.validateUloga(session,"Admin") && sessionService.validateSession(session)) {
+
+            Restoran restoran = restoranService.findByNaziv(restoranNazivDto.getNaziv()); // naziv je 100% ispravan, jer ga uzimamo iz baze
+            List<Komentar> komentarList = komentarService.findAllByRestoran(restoran);
+
+            Menadzer menadzer = menadzerService.menadzerKonkretnogRestorana(restoran);
+            menadzer.setRestoran(null);
+
+
+
+            List<Kupac> kupacList = kupacService.findAll();
+            List<Porudzbina> tmp = new ArrayList<>();
+            for (Kupac kupac:kupacList) {
+                for (Porudzbina porudzbina: kupac.getIstorija_porudzbina()) {
+                    if (porudzbina.getRestoran() == restoran) {
+                        tmp.add(porudzbina);
+                        //kupac.getIstorija_porudzbina().remove(porudzbina);
+                    }
+                }
+                for (Porudzbina porudzbina: tmp) {
+                    kupac.getIstorija_porudzbina().remove(porudzbina);
+                }
+            }
+
+
+
+            List<Dostavljac> dostavljacList = dostavljacService.findAll();
+            List<Porudzbina> tmp2 = new ArrayList<>();
+            for (Dostavljac dostavljac:dostavljacList) {
+                for (Porudzbina porudzbina: dostavljac.getPorudzbine()) {
+                    if (porudzbina.getRestoran() == restoran) {
+                        tmp2.add(porudzbina);
+                        //dostavljac.getPorudzbine().remove(porudzbina);
+                    }
+                }
+                for (Porudzbina porudzbina: tmp) {
+                    dostavljac.getPorudzbine().remove(porudzbina);
+                }
+            }
+
+            List<Porudzbina> porudzbinaList = porudzbinaService.findAllByRestoran(restoran);
+            for (Porudzbina porudzbina:porudzbinaList) {
+                porudzbinaService.delete(porudzbina);
+            }
+
+            for (Komentar komentar:komentarList) {
+                komentarService.delete(komentar);
+            }
+            restoranService.delete(restoran);
+
+            return new ResponseEntity("Uspesno obrisan restoran", HttpStatus.OK);
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }

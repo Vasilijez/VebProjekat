@@ -8,6 +8,8 @@ import vezbe.demo.model.Menadzer;
 import vezbe.demo.repository.DostavljacRepository;
 import vezbe.demo.repository.MenadzerRepository;
 
+import java.util.List;
+
 @Service
 public class DostavljacService {
 
@@ -17,5 +19,9 @@ public class DostavljacService {
     public Dostavljac save(Dostavljac dostavljac) {
         dostavljac.setUloga(Korisnik.Uloga.Dostavljac);
         return dostavljacRepository.save(dostavljac);
+    }
+
+    public List<Dostavljac> findAll() {
+        return dostavljacRepository.findAll();
     }
 }

@@ -18,6 +18,14 @@ public class KomentarService {
         return komentarRepository.findAllByRestoran(restoran);
     }
 
+    public void delete(Komentar komentar) {
+        komentarRepository.delete(komentar);
+    }
+
+    public void save(Komentar komentar) {
+        komentarRepository.save(komentar);
+    }
+
     public double averageMark(Restoran restoran) {
         List<Komentar> komentari = findAllByRestoran(restoran);
         double ocena = 0;
