@@ -1,10 +1,18 @@
 package vezbe.demo.configuration;
 
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import vezbe.demo.model.*;
 import vezbe.demo.repository.*;
+
+import java.io.*;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.*;
 

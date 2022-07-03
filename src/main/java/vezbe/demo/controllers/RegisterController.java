@@ -62,7 +62,6 @@ public class RegisterController {
             errorDic.put("Datum", "Polje datum je neispravno uneseno");
         if (registerDto.getPol() == null)
             errorDic.put("Datum", "Polje pol je neispravno uneseno");
-
         return errorDic;
     }
 }

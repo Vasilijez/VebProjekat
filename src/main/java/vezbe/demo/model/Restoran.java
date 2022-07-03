@@ -21,7 +21,7 @@ public class Restoran implements Serializable {
     @Column
     private String tipRestorana;
 
-    @JsonIgnore // dodao
+    //@JsonIgnore // dodao
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Artikal> artikli = new HashSet<>();
 

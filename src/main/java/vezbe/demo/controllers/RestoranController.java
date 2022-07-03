@@ -202,6 +202,51 @@ public class RestoranController {
         return new ResponseEntity(restoranPojedinacniDto, HttpStatus.OK);
     }
 
+    @GetMapping(
+        value = "/restoran/{naziv}",
+        /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity izaberiRestoranNazivom(@PathVariable("naziv") String naziv) {
+
+        Restoran restoran;
+
+
+        try {
+            restoran = restoranService.findByNaziv(naziv);
+        } catch (Exception e) {
+
+            return new ResponseEntity("Neispravan naziv", HttpStatus.BAD_REQUEST);
+        }
+
+        RestoranPojedinacniDto restoranPojedinacniDto = new RestoranPojedinacniDto(restoran);
+
+        restoranPojedinacniDto.setKomentari(komentarService.findAllByRestoran(restoran));
+        restoranPojedinacniDto.setProsecnaOcena(komentarService.averageMark(restoran));
+        restoranPojedinacniDto.setStatus(RestoranPojedinacniDto.Status.RADI);
+
+
+        return new ResponseEntity(restoranPojedinacniDto, HttpStatus.OK);
+    }
+
+    @GetMapping(
+            value = "/artikal/{id}",
+            /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity pronadjiArtikal(@PathVariable("id") Long id) {
+
+        Artikal artikal;
+
+        try {
+            artikal = artikalService.nadjiArtikal(id);
+        } catch (Exception e) {
+            return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
+        }
+        // todo dto, mrzi me
+        return new ResponseEntity(artikal, HttpStatus.OK);
+    }
+
+
+
     @PostMapping("/restoran/dodaj-artikal")
     public ResponseEntity dodajArtikal(@RequestBody ArtikalDto artikalDto, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
@@ -213,6 +258,11 @@ public class RestoranController {
 
             Artikal artikal = new Artikal(artikalDto.getNaziv(), artikalDto.getCena(), artikalDto.getTip(), artikalDto.getKolicina(), artikalDto.getOpis());
             artikalService.save(artikal);
+
+            Menadzer menadzer = (Menadzer) korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session));
+            Restoran restoran = menadzer.getRestoran();
+            restoran.getArtikli().add(artikal);
+            restoranService.save(restoran);
 
             return new ResponseEntity("Uspesno dodat artikal", HttpStatus.OK);
         } else
@@ -238,15 +288,20 @@ public class RestoranController {
         return errorDic;
     }
 
-    @PutMapping("/restoran/izmeni-artikal/{id}")
+    @PutMapping(
+        value = "/restoran/izmeni-artikal/{id}",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity izmeniArtikal(@RequestBody ArtikalDto artikalDto, @PathVariable Long id, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
             HashMap<String, String> errorDic = ValidateArtikalPriMenjanju(artikalDto);
 
+
+            System.out.println("stigao");
             if (!errorDic.isEmpty()){
                 return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
             }
-
+            System.out.println("stigao2");
             Artikal artikal;
             try {
                 artikal = artikalService.nadjiArtikal(id);
@@ -254,6 +309,7 @@ public class RestoranController {
                 return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
             }
 
+            System.out.println("stigao3");
             artikalService.azuriraj(artikalDto, artikal);
 
             return new ResponseEntity("Uspesno azuriran artikal", HttpStatus.OK);
@@ -266,8 +322,8 @@ public class RestoranController {
 
         if (artikalDto.getNaziv() != null && (artikalDto.getNaziv().isEmpty() || artikalDto.getNaziv().length()>25))
             errorDic.put("Naziv", "Polje naziv je neispravno uneseno");
-        if (artikalDto.getNaziv() != null && (artikalService.CheckNazivAgainst(artikalDto.getNaziv())))
-            errorDic.put("Naziv", "Naziv artikla vec postoji, unesite drugi");
+        /*if (artikalDto.getNaziv() != null && (artikalService.CheckNazivAgainst(artikalDto.getNaziv())))
+            errorDic.put("Naziv", "Naziv artikla vec postoji, unesite drugi");*/
         if (artikalDto.getCena() <= 0)
             errorDic.put("Cena", "Polje cena je neispravno uneseno");
         // ostaje provera za sliku da se odradi
@@ -278,7 +334,10 @@ public class RestoranController {
         return errorDic;
     }
 
-    @GetMapping("/restoran/obrisi-artikal/{id}")
+    @GetMapping(
+        value = "/restoran/obrisi-artikal/{id}",
+        /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity obrisiArtikal(@PathVariable Long id, HttpSession session) {
         if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
 
@@ -302,6 +361,7 @@ public class RestoranController {
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
+
 
     @PostMapping(
     value = "obrisi-restoran")

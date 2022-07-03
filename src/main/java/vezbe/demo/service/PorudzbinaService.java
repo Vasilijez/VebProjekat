@@ -7,6 +7,7 @@ import vezbe.demo.model.Restoran;
 import vezbe.demo.repository.PorudzbinaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PorudzbinaService {
@@ -16,6 +17,10 @@ public class PorudzbinaService {
 
     public List<Porudzbina> findAllByRestoran(Restoran restoran) {
         return porudzbinaRepository.findAllByRestoran(restoran);
+    }
+
+    public Optional<Porudzbina> findById(String id) {
+        return porudzbinaRepository.findById(id);
     }
 
     public void delete(Porudzbina porudzbina) {
