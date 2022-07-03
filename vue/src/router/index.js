@@ -16,13 +16,42 @@ import KreirajDostavljacaView from '../views/KreirajDostavljacaView.vue'
 import KreirajRestoranView from '../views/KreirajRestoranView.vue'
 import ObrisiRestoranView from '../views/ObrisiRestoranView.vue'
 import IzaberiMenadzeraView from '../views/IzaberiMenadzeraView.vue'
-
+import ArtikalView from '../views/ArtikalView.vue'
+import PorudzbinaView from '../views/PorudzbinaView.vue'
+import ArtikalDodajView from '../views/ArtikalDodajView.vue'
+import KupacView from '../views/KupacView.vue'
+import DostavljacView from '../views/DostavljacView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/artikal-dodaj',
+    name: 'ArtikalDodaj',
+    component: ArtikalDodajView
+  },
+  {
+    path: '/dostavljac',
+    name: 'Dostavljac',
+    component: DostavljacView
+  },
+  {
+    path: '/kupac',
+    name: 'Kupac',
+    component: KupacView
+  },
+  {
+    path: '/artikal',
+    name: 'Artikal',
+    component: ArtikalView
+  },
+  {
+    path: '/porudzbina',
+    name: 'Porudzbina',
+    component: PorudzbinaView
   },
   {
     path: '/izaberi-menadzera',
