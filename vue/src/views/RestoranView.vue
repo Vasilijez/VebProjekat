@@ -140,9 +140,9 @@ export default {
     methods: {
         poruci: function(artikal_id) {
             axios
-            .put('http://localhost:8086/api/dodajUKorpu/' + this.restoran.id + '/' + artikal_id, {withCredentials: true})
+            .get('http://localhost:8081/api/dodajUKorpuNazivomRestorana/' + this.restoran.naziv + '/' + artikal_id, {withCredentials:'include'})
             .then((res) => {
-                console.log(res.data)
+                alert(res.data)
             })
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)

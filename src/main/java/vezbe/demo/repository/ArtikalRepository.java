@@ -7,4 +7,5 @@ import vezbe.demo.model.Artikal;
 @Repository
 public interface ArtikalRepository extends JpaRepository<Artikal, Long> {
 
+    Artikal findByNaziv(String naziv);
 }

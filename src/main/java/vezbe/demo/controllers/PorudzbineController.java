@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.KomentarDto;
 import vezbe.demo.dto.KorpaDto;
 import vezbe.demo.model.*;
-import vezbe.demo.service.KomentarService;
-import vezbe.demo.service.KorisnikService;
-import vezbe.demo.service.PorudzbinaService;
-import vezbe.demo.service.SessionService;
+import vezbe.demo.service.*;
 
 import javax.servlet.http.HttpSession;
 import java.util.*;
@@ -30,8 +27,14 @@ public class PorudzbineController {
     PorudzbinaService porudzbinaService;
 
     @Autowired
+    ArtikalService artikalService;
+
+    @Autowired
     KomentarService komentarService;
     // KomentarDto komentarDto;
+
+    @Autowired
+    RestoranService restoranService;
 
     @GetMapping(
     value = "/porudzbine",
@@ -91,6 +94,41 @@ public class PorudzbineController {
             // todo dto, mrzi me
 
             return new ResponseEntity(porudzbina, HttpStatus.OK);
+        } else
+            return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
+    }
+
+    @GetMapping(
+            value = "/porudzbina-id",
+            /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity pronadjiArtikal(HttpSession session) {
+        if (sessionService.validateUloga(session,"Kupac") && sessionService.validateSession(session)) {
+
+            Kupac ulogovani = (Kupac) korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session));
+            Set<Porudzbina> porudzbinaSet = ulogovani.getIstorija_porudzbina();
+
+            Porudzbina porudzbina = null;
+            for (Porudzbina p : porudzbinaSet){
+                if (p.getStatus() == Porudzbina.Status.u_korpi) {
+                    porudzbina = p;
+                    break;
+                }
+            }
+
+            /*try {
+                porudzbina = porudzbinaService.findById(id.toString());
+            } catch (Exception e) {
+                return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
+            }*/
+            // todo dto, mrzi me
+
+            if (porudzbina == null)
+                return new ResponseEntity(HttpStatus.BAD_REQUEST);
+
+            UUID id = porudzbina.getId();
+
+            return new ResponseEntity(id, HttpStatus.OK);
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
@@ -163,6 +201,78 @@ public class PorudzbineController {
         return ResponseEntity.ok("Artikal je uspesno dodat u korpu!");
     }
 
+    @GetMapping // nazivRestorana - restoran, id2 artikal
+    (
+    value = "dodajUKorpuNazivomRestorana/{nazivRestorana}/{id2}",
+    /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+    produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> dodajUKorpuNazivomRestorana(@PathVariable(name = "nazivRestorana") String nazivRestorana, @PathVariable(name = "id2") Long id2, HttpSession session) {
+
+        //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
+        Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao
+
+        if (ulogovani == null)
+            return new ResponseEntity<>("Morate da se ulogujete, da biste mogli da vrsite ovu akciju!", HttpStatus.BAD_REQUEST);
+        if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
+            return new ResponseEntity<>("Dodavanje artikla u korpu je dozvoljeno samo kupcima!", HttpStatus.BAD_REQUEST);
+
+        Artikal artikal = porudzbinaService.findArtikalById(id2);
+        Restoran restoran = restoranService.findByNaziv(nazivRestorana);
+
+        if (artikal == null)
+            return new ResponseEntity<>("Zeljeni artikal nije pronadjen!", HttpStatus.NOT_FOUND);
+        if (!porudzbinaService.ArtikaluRestoranu(restoran.getId(), id2))
+            return new ResponseEntity<>("Zeljeni restoran nema dati artikal u svojoj ponudi!", HttpStatus.NOT_FOUND);
+
+        Kupac ulogovaniKupac = (Kupac) ulogovani;
+        Set<Porudzbina> porudzbine = ulogovaniKupac.getIstorija_porudzbina();
+        Porudzbina porudzbina = new Porudzbina();
+        porudzbina.setRestoran(porudzbinaService.findRestoranById(restoran.getId()));
+        porudzbina.setKupac(ulogovaniKupac);
+        porudzbina.setStatus(Porudzbina.Status.u_korpi);
+        //porudzbinaService.save(porudzbina); obrisao
+
+        for (Porudzbina p : porudzbine) {
+            if (p.getStatus().equals(Porudzbina.Status.u_korpi)) {
+                porudzbina = p;
+                break;
+            }
+        }
+
+        // novokreirana porudzbina - zna se samo da je "u korpi"
+        if (porudzbina.getRestoran() == null) {
+            porudzbina.setRestoran(porudzbinaService.findRestoranById(restoran.getId()));
+            porudzbinaService.save(porudzbina);
+        }
+        if (porudzbina.getKupac() == null) {
+            porudzbina.setKupac(ulogovaniKupac);
+            porudzbinaService.save(porudzbina);
+        }
+
+        // proveravam da li vec postoji taj artikal u porudzbini, ako da, povecavam kolicinu
+        for (ArtikalUPorudzbini ap : porudzbina.getArtikliUPorudzbini()) {
+            if (ap.getArtikal().getId().equals(id2)) {
+                ap.setKolicina(ap.getKolicina() + 1);     // povecavam kolicinu
+                porudzbinaService.saveArtikalUPorudzbini(ap);
+                porudzbina.setCena(porudzbina.getCena() + artikal.getCena()); // povecavam cenu
+                porudzbinaService.save(porudzbina);
+                porudzbinaService.saveKupac(ulogovaniKupac);
+
+                return ResponseEntity.ok("Artikal je uspesno dodat u korpu!");
+            }
+        }
+
+        ArtikalUPorudzbini ap = new ArtikalUPorudzbini(artikal, 1);
+        porudzbinaService.saveArtikalUPorudzbini(ap);
+        porudzbina.getArtikliUPorudzbini().add(ap);
+        porudzbina.setCena(porudzbina.getCena() + artikal.getCena());
+        porudzbinaService.save(porudzbina);
+        ulogovaniKupac.dodajPorudzbinu(porudzbina);
+        porudzbinaService.saveKupac(ulogovaniKupac);
+
+        return ResponseEntity.ok("Artikal je uspesno dodat u korpu!");
+    }
+
     @DeleteMapping("izbaciIzKorpe/{id}")
     public ResponseEntity<String> izbaciIzKorpe(@PathVariable Long id ,HttpSession session) {
 
@@ -174,6 +284,35 @@ public class PorudzbineController {
         if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
             return new ResponseEntity<>("Brisanje artikla iz korpe je dozvoljeno samo kupcima!", HttpStatus.BAD_REQUEST);
 
+        Artikal artikal = porudzbinaService.findArtikalById(id);
+
+        if(artikal == null)
+            return new ResponseEntity<>("Artikal sa unetim id-om ne postoji", HttpStatus.BAD_REQUEST);
+
+        Kupac ulogovaniKupac = (Kupac) ulogovani;
+
+        //provera da li artikal postoji u korpi
+        if(!porudzbinaService.ArtikalUKorpi(ulogovaniKupac, id))
+            return new ResponseEntity<>("Dati artikal ne postoji u korpi!", HttpStatus.BAD_REQUEST);
+
+        porudzbinaService.izbaciIzKorpe(ulogovaniKupac, id);
+
+        return ResponseEntity.ok("Uspesno ste izbacili artikal iz korpe");
+    }
+
+    @DeleteMapping("izbaciIzKorpeNazivomArtikla/{nazivArtikla}")
+    public ResponseEntity<String> izbaciIzKorpeNazivomArtikla(@PathVariable(name = "nazivArtikla") String nazivArtikla ,HttpSession session) {
+
+        //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
+        Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao
+
+        if (ulogovani == null)
+            return new ResponseEntity<>("Morate da se ulogujete, da biste mogli da vrsite ovu akciju!", HttpStatus.BAD_REQUEST);
+        if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
+            return new ResponseEntity<>("Brisanje artikla iz korpe je dozvoljeno samo kupcima!", HttpStatus.BAD_REQUEST);
+
+        Artikal artikalTmp = artikalService.findArtikalByNaziv(nazivArtikla);
+        Long id = artikalTmp.getId();
         Artikal artikal = porudzbinaService.findArtikalById(id);
 
         if(artikal == null)
@@ -206,7 +345,11 @@ public class PorudzbineController {
         return ResponseEntity.ok(porudzbinaService.getKorpa(ulogovaniKupac));
     }
 
-    @PutMapping("submitKorpe")
+    // sa put -> get zbog axiosa, nece da radi sa post ili put
+    @GetMapping(
+    value = "submitKorpe",
+    /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+    produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> submitKorpe(HttpSession session) {
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
@@ -221,6 +364,8 @@ public class PorudzbineController {
 
         return ResponseEntity.ok(porudzbinaService.submitKorpe(ulogovaniKupac));
     }
+
+
     //-----------------------------------------------------------------------------
     @PutMapping("porudzbinaUPripremi/{id}")
     public ResponseEntity<String> porudzbinaUPripremi(@PathVariable UUID id, HttpSession session) throws Exception {
