@@ -73,14 +73,26 @@
     </tr>
   </thead>
   <tbody>
-    <tr  v-for="(porudzbina,i) in this.menadzer.porudzbinaList" :key="i">
+    <tr  v-for="(porudzbina,i) in porudzbine" :key="i">
             <th scope="row">{{i}}</th>
-            <td>{{porudzbina.datum_vreme.substring(0,10)}}</td>
-            <td>{{porudzbina.datum_vreme.substring(11,19)}}</td>
+            <td>{{porudzbina.datum_vreme}}</td>
+            <td>{{porudzbina.datum_vreme}}</td>
             <td>{{porudzbina.cena}}</td>
             <td>{{porudzbina.status}}</td>
-            <td><button @click="this.$router.push('/porudzbina?id=' + porudzbina.id)" type="button" class="btn btn-secondary"><i class="bi bi-check-circle-fill text-light"></i> Izmeni</button></td>
-     </tr>
+            <td>
+              <div class="dropdown show">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Dropdown link
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <a class="dropdown-item" href="#">Action</a>
+    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="#">Something else here</a>
+  </div>
+</div>
+            </td>
+    </tr>
   </tbody>
 </table>
 
@@ -106,7 +118,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr  v-for="(artikal,i) in this.menadzer.restoran.artikli" :key="i">
+    <tr  v-for="(artikal,i) in menadzer.restoran.artikli" :key="i">
             <th scope="row">{{i}}</th>
             <td>{{artikal.naziv}}</td>
             <td>{{artikal.cena}}</td>
@@ -149,6 +161,8 @@
 -->
 </template>
 <script>
+// <td><button @click="this.$router.push('/porudzbina?id=' + porudzbina.id)" type="button" class="btn btn-secondary"><i class="bi bi-check-circle-fill text-light"></i> Izmeni</button></td>
+     
 import axios from "axios";
 export default {
     name: 'MenadzerView',
@@ -164,20 +178,35 @@ export default {
                         sirina: "", 
                         duzina: ""}
                     }, 
-                    porudzbinaList: [ {
+                    porudzbinaList: [{
                         artikli: [],
-                        restoran: [],
+                        restoran: {},
                         datum_vreme: "",
                         cena: 0,
                         status: ""
-                    } ] 
+                    }]
             },
+            porudzbine: [{
+                        artikli: [],
+                        restoran: {},
+                        datum_vreme: "",
+                        cena: 0,
+                        status: ""
+                    }],
             restoran: { lokacija: { adresa: "", sirina: "", duzina: ""}}, // pravi gresku morao sam dodati
         }
     },
     mounted: function() {
         // ovde kao callback funkciju odmah poziva i pravi employee
-       
+                   axios
+            .get('http://localhost:8081/api/porudzbine/', {withCredentials: true})
+            .then((res) => {
+                console.log(res.data)
+                this.porudzbine = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
         axios
             .get('http://localhost:8081/api/menadzer/', {withCredentials: true})
             .then((res) => {
@@ -188,6 +217,7 @@ export default {
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)
             })
+
 
     },
     methods: {

@@ -21,12 +21,18 @@ import PorudzbinaView from '../views/PorudzbinaView.vue'
 import ArtikalDodajView from '../views/ArtikalDodajView.vue'
 import KupacView from '../views/KupacView.vue'
 import DostavljacView from '../views/DostavljacView.vue'
+import PregledKorpeView from '../views/PregledKorpeView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/pregled-korpe',
+    name: 'PregledKorpe',
+    component: PregledKorpeView
   },
   {
     path: '/artikal-dodaj',

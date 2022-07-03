@@ -59,4 +59,8 @@ public class ArtikalService {
         artikalRepository.delete(artikal);
     }
 
+    public Artikal findArtikalByNaziv(String naziv) {
+        return artikalRepository.findByNaziv(naziv);
+    }
+
 }
