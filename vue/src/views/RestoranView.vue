@@ -1,28 +1,42 @@
 <template>
 
+
 <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
     />
 
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
+    <a class="navbar-brand">Odnesi</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" href="/">Početna</a>
+          <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#">Odjavi se</a>
+          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+        </li>
+        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="/pregled-korpe">Pregled korpe</a>
+          <a class="nav-link active" aria-current="page" href="/profil">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link active" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
         </li>
       </ul>
     </div>
@@ -71,7 +85,7 @@
       <th class="col-md-2 col-xs-3">Kolicina</th>
       <th class="col-md-2 col-xs-3">Opis</th>      
       <th class="col-md-2 col-xs-3">Slika</th>
-      <th v-if="restoran.status == 'RADI'" class="col-md-2 col-xs-3">Poruci</th>
+      <th v-if="restoran.status == 'RADI' && this.uloga === 'Kupac'" class="col-md-2 col-xs-3">Poruci</th>
 
     </tr>
     <tr class="warning no-result">
@@ -86,8 +100,8 @@
             <td>{{artikal.tip}}</td>
             <td>{{artikal.kolicina}}</td>
             <td>{{artikal.opis}}</td>
-            <td><img :src="'http://localhost:8081/get/image/'+artikal.naziv+'.jpg'" v-bind:alt="pic" style="width:100px;height:100px;"></td>
-            <td><button v-if="restoran.status == 'RADI'" @click="poruci(artikal.id)" type="button" class="btn btn-primary"><i class="bi bi-check-circle-fill text-light"></i> Poruči</button></td>
+            <td><img v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/></td>
+            <td v-if="restoran.status == 'RADI' && this.uloga === 'Kupac'"><button @click="poruci(artikal.id)" type="button" class="btn btn-primary"><i class="bi bi-check-circle-fill text-light"></i> Poruči</button></td>
      </tr>
   </tbody>
 </table>
@@ -116,6 +130,9 @@
 
 </template>
 <script>
+//<td><img v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/></td>
+            
+// <td><img :src="'http://localhost:8081/get/image/'+artikal.naziv+'.jpg'" v-bind:alt="pic" style="width:100px;height:100px;"></td>
 import axios from "axios";
 export default {
     name: 'RestoranView',

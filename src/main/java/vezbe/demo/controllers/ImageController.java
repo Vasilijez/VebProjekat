@@ -50,6 +50,8 @@ public class ImageController {
 
         final Optional<Image> dbImage = imageRepository.findByName(name);
 
+
+
         return ResponseEntity
                 .ok()
                 .contentType(MediaType.valueOf(dbImage.get().getType()))

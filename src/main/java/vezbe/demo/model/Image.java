@@ -29,4 +29,9 @@ public class Image {
     @Column(name = "image", unique = false, nullable = false, length = 1000000)
     private byte[] image;
 
+/*    public Image(String name, String type, byte[] image) {
+        this.name = name;
+        this.type = type;
+        this.image = image;
+    }*/
 }

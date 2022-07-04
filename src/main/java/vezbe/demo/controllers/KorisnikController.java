@@ -57,6 +57,20 @@ public class KorisnikController {
         }
     }
 
+    // metoda kojom cemo znati kome sta da prikazemo
+    @GetMapping(
+            value = "vratiUlogu",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity vratiUlogu(HttpSession session) {
+        if (sessionService.validateSession(session)) {
+            Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao
+
+            return new ResponseEntity(ulogovani.getUloga(), HttpStatus.OK);
+        } else
+            return new ResponseEntity("neovlascen_pristup", HttpStatus.FORBIDDEN);
+    }
+
+
     @PutMapping("izmeni-profil")
     public ResponseEntity izmeniProfil(@RequestBody KorisnikAzuriranDto korisnikAzuriranDto, HttpSession session) {
         if (sessionService.validateSession(session)) {

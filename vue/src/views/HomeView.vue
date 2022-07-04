@@ -1,34 +1,40 @@
 <template>
 
-<link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
-
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand">Odnesi</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Početna</a>
+          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+        </li>
+        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Odjavi se</a>
+          <a class="nav-link active" aria-current="page" href="/profil">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+
+
+<br>
 
 <div class="form-group pull-right">
     <input type="text" class="search form-control" placeholder="Koji restoran tražite?">
@@ -64,17 +70,14 @@
 
 
 
+    <div v-if="this.uloga === 'Admin'">
     <br>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
-    <br>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
-    <br>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
-    <br>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
-    <br>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/izaberi-menadzera')">Izaberi menadžera</button>
-
+    </div>
 
 
 
@@ -90,10 +93,19 @@ export default {
     name: "HomeView",
     data: function () {
         return {
+            uloga: "neovlascen_pristup",
             restorani: []
         };
     },
     mounted: function () {
+      axios // uloga
+            .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
+            .then((res) => {
+                this.uloga = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
     
     $(document).ready(function() {
   $(".search").keyup(function () {
