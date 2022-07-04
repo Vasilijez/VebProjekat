@@ -3,6 +3,7 @@ package vezbe.demo.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +56,8 @@ public class LoginController {
         return new ResponseEntity(korisnik, HttpStatus.OK);
     }
 
-    @PostMapping("api/logout")
+    // u get zbog axiosa
+    @GetMapping("api/logout")
     public ResponseEntity Logout(HttpSession session){
         String korisnicko_ime = sessionService.getKorisnicko_Ime(session);
         String uloga = sessionService.getUloga(session);

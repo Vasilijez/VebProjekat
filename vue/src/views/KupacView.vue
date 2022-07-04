@@ -75,9 +75,9 @@
   </tbody>
 </table>
 
-<b>Tip kupca: </b>
+<b>Tip kupca:</b> <a>{{this.kupac.tip_kupca.ime}}</a>
 <br>
-<b>Broj poena: </b>
+<b>Broj poena: </b> <a>{{this.kupac.broj_bodova}}</a>
   
 </template>
 <script>
@@ -86,6 +86,10 @@ export default {
     name: 'KupacView',
     data: function() {
         return {
+            kupac: { 
+              tip_kupca: "",
+              broj_bodova : "",
+            },
             uloga: "neovlascen_pristup",
             porudzbine: [{
                         artikli: [],
@@ -113,6 +117,16 @@ export default {
             .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
             .then((res) => {
                 this.uloga = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
+
+        axios
+            .get('http://localhost:8081/api/kupac/', {withCredentials: true})
+            .then((res) => {
+                console.log(res.data)
+                this.kupac = res.data
            })
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)

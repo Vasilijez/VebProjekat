@@ -33,7 +33,8 @@ export default {
                 this.ucitana()
            })
             .catch((err) =>{ // todo neovlascen pristup
-                console.log(err)
+                alert("Neovlascen pristup")
+                this.$router.push("/login")
             })
     }
 };    

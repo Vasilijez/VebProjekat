@@ -355,6 +355,20 @@ public class RestoranController {
             if (restoran.getArtikli().contains(artikal)) {
                 restoran.getArtikli().remove(artikal);
                 restoranService.save(restoran);
+
+                // svi koji pokazuju na artikal moraju biti azuriran
+                List<Dostavljac> dostavljacList = dostavljacService.findAll();
+                for (Dostavljac dostavljac : dostavljacList) {
+                    if (dostavljac.getPorudzbine().contains(artikal)) {
+                        dostavljac.getPorudzbine().remove(artikal);
+                        dostavljacService.save(dostavljac);
+                    }
+                }
+
+
+
+
+                artikalService.delete(artikal);
                 return new ResponseEntity("Uspesno obrisan artikal", HttpStatus.OK);
             }
 

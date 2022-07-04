@@ -13,17 +13,19 @@ public class KorisnikDto {
     private Korisnik.Pol p;
     private Date datum_rodjenja;
     private Korisnik.Uloga uloga;
+    private String lozinka;
 
     public KorisnikDto() {
     }
 
-    public KorisnikDto(String korisnickoIme, String ime, String prezime, Korisnik.Pol p, Date datum_rodjenja, Korisnik.Uloga uloga) {
+    public KorisnikDto(String korisnickoIme, String ime, String prezime, Korisnik.Pol p, Date datum_rodjenja, Korisnik.Uloga uloga, String lozinka) {
         this.korisnickoIme = korisnickoIme;
         this.ime = ime;
         this.prezime = prezime;
         this.p = p;
         this.datum_rodjenja = datum_rodjenja;
         this.uloga = uloga;
+        this.lozinka = lozinka;
     }
 
     public KorisnikDto(Korisnik korisnik) {
@@ -33,6 +35,15 @@ public class KorisnikDto {
         this.p = korisnik.getP();
         this.datum_rodjenja = korisnik.getDatum_rodjenja();
         this.uloga = korisnik.getUloga();
+        this.lozinka = korisnik.getLozinka();
+    }
+
+    public String getLozinka() {
+        return lozinka;
+    }
+
+    public void setLozinka(String lozinka) {
+        this.lozinka = lozinka;
     }
 
     public String getKorisnickoIme() {

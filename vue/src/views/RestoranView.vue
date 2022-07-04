@@ -27,9 +27,9 @@
           <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+          <a v-if="this.uloga == 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
         </li>
-        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+        <li  v-if="this.uloga != 'neovlascen_pristup'" class="nav-item">
           <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
@@ -37,6 +37,9 @@
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a v-if="this.uloga === 'Kupac'" class="nav-link active" aria-current="page" href="/pregled-korpe">Pregled korpe</a>
         </li>
       </ul>
     </div>
@@ -138,6 +141,7 @@ export default {
     name: 'RestoranView',
     data: function() {
         return {
+            uloga: "neovlascen_pristup",
             restoran: { lokacija: { adresa: "", sirina: "", duzina: ""}}, // pravi gresku morao sam dodati
         }
     },
@@ -150,6 +154,14 @@ export default {
                 console.log(res.data)
                 this.restoran = res.data
             })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
+        axios // uloga
+            .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
+            .then((res) => {
+                this.uloga = res.data
+           })
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)
             })

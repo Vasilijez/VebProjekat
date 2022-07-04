@@ -20,13 +20,18 @@ import PregledKorpeView from '../views/PregledKorpeView.vue'
 import KomentarView from '../views/KomentarView.vue'
 import ImageView from '../views/ImageView.vue'
 import DashboardView from '../views/DashboardView.vue'
-
+import OdjaviSeView from '../views/OdjaviSeView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/odjavi-se',
+    name: 'OdjaviSe',
+    component: OdjaviSeView
   },
   {
     path: '/dashboard',

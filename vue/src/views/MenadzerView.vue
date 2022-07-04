@@ -8,7 +8,14 @@
 <br>  
 <br>  
 <br>  
-
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand">Odnesi</a>
@@ -228,7 +235,8 @@ export default {
                 this.uloga = res.data
            })
             .catch((err) =>{ // todo neovlascen pristup
-                console.log(err)
+                alert("Neovlascen pristup")
+                this.$router.push("/login")
             })
 
 
