@@ -57,8 +57,14 @@
     <tr  v-for="(porudzbina,i) in porudzbine" :key="i">
             <th scope="row">{{i}}</th>
             <td>{{porudzbina.restoran.naziv}}</td>
-            <td>{{porudzbina.datum_vreme.substring(0,10)}}</td>
-            <td>{{porudzbina.datum_vreme.substring(11,19)}}</td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(0,10)}}</a>                
+                <a v-else>-</a>                
+            </td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(11,19)}}</a>                
+                <a v-else>-</a>                
+            </td>
             <td>{{porudzbina.cena}}</td>
             <td>{{porudzbina.status}}</td>
             <td>

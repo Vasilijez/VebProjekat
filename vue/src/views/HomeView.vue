@@ -72,10 +72,10 @@
 
     <div v-if="this.uloga === 'Admin'">
     <br>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
+    <button type="button" class="btn btn-danger btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/izaberi-menadzera')">Izaberi menadžera</button>
     </div>
 

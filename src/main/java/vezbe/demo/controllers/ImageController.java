@@ -9,6 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import vezbe.demo.model.Image;
+import vezbe.demo.repository.ImageRepository;
+import vezbe.demo.util.ImageUtility;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -22,7 +25,7 @@ public class ImageController {
     ImageRepository imageRepository;
 
     @PostMapping("/upload/image")
-    public ResponseEntity<ImageUploadResponse> uplaodImage(@RequestParam("image") MultipartFile file)
+    public ResponseEntity<ImageUploadResponse> uplaodImage(@RequestParam("file") MultipartFile file)
             throws IOException {
 
         imageRepository.save(Image.builder()
@@ -49,8 +52,6 @@ public class ImageController {
     public ResponseEntity<byte[]> getImage(@PathVariable("name") String name) throws IOException {
 
         final Optional<Image> dbImage = imageRepository.findByName(name);
-
-
 
         return ResponseEntity
                 .ok()

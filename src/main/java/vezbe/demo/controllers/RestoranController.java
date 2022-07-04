@@ -46,6 +46,9 @@ public class RestoranController {
     @Autowired
     DostavljacService dostavljacService;
 
+    @Autowired
+    ArtikalPorudzbinaService artikalPorudzbinaService;
+
     @GetMapping(
     value = "/restorani",
     produces = MediaType.APPLICATION_JSON_VALUE)
@@ -352,27 +355,32 @@ public class RestoranController {
                 return new ResponseEntity("Neispravan id", HttpStatus.BAD_REQUEST);
             }
 
+            // ArtikalPorudzbina
+            ArtikalPorudzbina artikalPorudzbina = artikalPorudzbinaService.findByArtikalId(id);
+            if (artikalPorudzbina != null)
+                artikalPorudzbinaService.delete(artikalPorudzbina);
+
+
+            // Dostavljac
+            List<Dostavljac> dostavljacList = dostavljacService.findAll();
+            for (Dostavljac dostavljac : dostavljacList) {
+                if (dostavljac.getPorudzbine().contains(artikal)) {
+                    dostavljac.getPorudzbine().remove(artikal);
+                    dostavljacService.save(dostavljac);
+                }
+            }
+
+            // Restoran
             if (restoran.getArtikli().contains(artikal)) {
                 restoran.getArtikli().remove(artikal);
                 restoranService.save(restoran);
-
-                // svi koji pokazuju na artikal moraju biti azuriran
-                List<Dostavljac> dostavljacList = dostavljacService.findAll();
-                for (Dostavljac dostavljac : dostavljacList) {
-                    if (dostavljac.getPorudzbine().contains(artikal)) {
-                        dostavljac.getPorudzbine().remove(artikal);
-                        dostavljacService.save(dostavljac);
-                    }
-                }
-
-
-
-
-                artikalService.delete(artikal);
-                return new ResponseEntity("Uspesno obrisan artikal", HttpStatus.OK);
             }
 
-            return new ResponseEntity("Artikal ne pripada restoranu", HttpStatus.OK);
+            // Kupac
+            // Porudzbina - ne
+
+
+            return new ResponseEntity("Uspesno obrisan artikal", HttpStatus.OK);
         } else
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
@@ -387,7 +395,8 @@ public class RestoranController {
             List<Komentar> komentarList = komentarService.findAllByRestoran(restoran);
 
             Menadzer menadzer = menadzerService.menadzerKonkretnogRestorana(restoran);
-            menadzer.setRestoran(null);
+            if (menadzer != null)
+                menadzer.setRestoran(null);
 
 
 

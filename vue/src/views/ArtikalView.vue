@@ -32,16 +32,14 @@
 <br>
 
 
-<!-- Bootstrap 5 CSS -->
+
+
+<!-- FORMA -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
-<!-- Font Awesome CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-
 
 <div class="card">
     
-
     <!-- todo, sliku ovde -->
 
     <br>
@@ -49,15 +47,13 @@
     <div id="app">
       <label> Naziv</label>
   <div class="d-flex flex-row mt-2 mb-3 align-items-center gap-1">
-    <input class="form-control" type="text" v-model="this.artikal.naziv"  
-           :class="{view: !isEditing}" >      
+    <input class="form-control" type="text" v-model="this.artikal.naziv">      
   </div>
 
   <label>Cena</label>
   <div class="d-flex flex-row mt-2 mb-3 align-items-left gap-1">
 
-    <input class="form-control" type="text" v-model="this.artikal.cena" 
-           :class="{view: !isEditing}">  
+    <input class="form-control" type="text" v-model="this.artikal.cena">  
   </div>
   
   <label>Tip</label>
@@ -71,21 +67,22 @@
   
   <label>Opis</label>
   <div class="d-flex flex-row mt-2 mb-3 align-items-center gap-1">
-    <input class="form-control" type="text"  v-model="this.artikal.opis" 
-           :class="{view: !isEditing}">  
+    <input class="form-control" type="text"  v-model="this.artikal.opis">  
   </div>
   
   
   <!-- todo -->
 
-  <label>Slika-upload(todo)</label>
-  <div class="d-flex flex-row mt-2 mb-3 align-items-center gap-1">
-    <input type="file" class="form-control" id="customFile" />
+  <label>Slika</label>
+  <div class="hello">
+      <form ref="uploadForm" @submit.prevent="submit">
+          <input type="file" ref="uploadImage" @change="onImageUpload()" class="form-control" required>
+      </form>
   </div>
   
   <div class="mt-3 mb-3">
     <button @click="save()" type="button" class="btn btn-labeled btn-success mr-3"> 
-      <span class="btn-label"><i class="fa fa-check"></i></span> Izmeni 
+      <span class="btn-label"><i class="fa fa-check"></i></span> Dodaj 
     </button>
     <button @click="cancel()" type="button" class="btn btn-labeled btn-danger"> 
       <span class="btn-label"><i class="fa fa-remove"></i></span> Otkaži
@@ -140,12 +137,32 @@ export default {
         cancel: function() {
             this.$router.push("/dashboard");
         },
+        onImageUpload() {
+            let file = this.$refs.uploadImage.files[0];
+            this.formData = new FormData();
+            this.formData.append("file", file);
+        },
         save: function() {
+            axios({
+                url: "http://localhost:8081/upload/image",
+                method: 'POST',
+                data: this.formData,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type' : 'multipart/form-data'
+                },
+            }).then(response => {
+                console.log(JSON.stringify(response.data));
+            });
+
+
+
             console.log(this.artikal)
             axios
             .put('http://localhost:8081/api/restoran/izmeni-artikal/' + this.$route.query.id, this.artikal, {withCredentials: true})
             .then(res => {
                 console.log(res)
+                alert("Uspesna izmena!")
                 this.$router.push("/dashboard");
             })
             .catch(error => {

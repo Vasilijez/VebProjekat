@@ -16,6 +16,12 @@
 <br>  
 <br>  
 <br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand">Odnesi</a>
@@ -96,8 +102,14 @@
   <tbody>
     <tr  v-for="(porudzbina,i) in porudzbine" :key="i">
             <th scope="row">{{i}}</th>
-            <td>{{porudzbina.datum_vreme.substring(0,10)}}</td>
-            <td>{{porudzbina.datum_vreme.substring(11,19)}}</td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(0,10)}}</a>                
+                <a v-else>-</a>                
+            </td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(11,19)}}</a>                
+                <a v-else>-</a>                
+            </td>
             <td>{{porudzbina.cena}}</td>
             <td>{{porudzbina.status}}</td>
             <td>
@@ -156,7 +168,11 @@
             <td>{{artikal.tip}}</td>
             <td>{{artikal.kolicina}}</td>
             <td>{{artikal.opis}}</td>
-            <td><img v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/></td>
+            
+            <td>
+              <img v-if="artikal.id <= 10" v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/>
+              <img v-else v-bind:src="'http://localhost:8081/get/image/' + artikal.naziv + '.jpg'" style="width:100px;height:100px;"/>
+            </td>
             <td><button @click="deleteEmployee(artikal.id)" type="button" class="btn btn-danger"><i class="bi bi-trash text-light"></i> Obriši</button></td>
             <td><button @click="this.$router.push('/artikal?id=' + artikal.id)" type="button" class="btn btn-secondary"><i class="bi bi-check-circle-fill text-light"></i> Izmeni</button></td>
      

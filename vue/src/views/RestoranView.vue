@@ -14,7 +14,14 @@
 <br>  
 <br>  
 <br>  
-
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand">Odnesi</a>
@@ -103,7 +110,10 @@
             <td>{{artikal.tip}}</td>
             <td>{{artikal.kolicina}}</td>
             <td>{{artikal.opis}}</td>
-            <td><img v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/></td>
+            <td>
+              <img v-if="artikal.id <= 10" v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/>
+              <img v-else v-bind:src="'http://localhost:8081/get/image/' + artikal.naziv + '.jpg'" style="width:100px;height:100px;"/>
+            </td>
             <td v-if="restoran.status == 'RADI' && this.uloga === 'Kupac'"><button @click="poruci(artikal.id)" type="button" class="btn btn-primary"><i class="bi bi-check-circle-fill text-light"></i> Poruči</button></td>
      </tr>
   </tbody>

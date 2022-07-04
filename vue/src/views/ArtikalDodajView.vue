@@ -76,9 +76,13 @@
   
   <!-- todo -->
 
-  <label>Slika-upload(todo)</label>
-  <div class="d-flex flex-row mt-2 mb-3 align-items-center gap-1">
-    <input type="file" class="form-control" id="customFile" />
+  <label>Slika</label>
+  <div class="hello">
+      <form ref="uploadForm" @submit.prevent="submit">
+          <input type="file" ref="uploadImage" @change="onImageUpload()" class="form-control" required>
+          
+      
+      </form>
   </div>
   
   <div class="mt-3 mb-3">
@@ -103,6 +107,7 @@ export default {
   name: "ArtikalView",
   data: function () {
     return {
+      formData: null,
       artikal: {
         naziv: "",
         cena: 0,
@@ -125,15 +130,31 @@ export default {
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)
             })
-
-            
-
     },
    methods: {
+        onImageUpload() {
+            let file = this.$refs.uploadImage.files[0];
+            this.formData = new FormData();
+            this.formData.append("file", file);
+        },
         cancel: function() {
             this.$router.push("/menadzer");
         },
         save: function() {
+
+            axios({
+                url: "http://localhost:8081/upload/image",
+                method: 'POST',
+                data: this.formData,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type' : 'multipart/form-data'
+                },
+            }).then(response => {
+                console.log(JSON.stringify(response.data));
+            });
+           
+
             console.log(this.artikal)
             axios
             .post("http://localhost:8081/api/restoran/dodaj-artikal", this.artikal, {withCredentials: true})

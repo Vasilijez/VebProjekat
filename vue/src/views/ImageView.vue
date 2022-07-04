@@ -1,16 +1,12 @@
 <template>
 
-<link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
-<div v-for="pic in pics">
-      <img :src="getImgUrl(pic)" v-bind:alt="pic">
-   </div>
-
-  
-
-
+<div class="hello">
+    <form ref="uploadForm" @submit.prevent="submit">
+        <input type="file" ref="uploadImage" @change="onImageUpload()" class="form-control" required>
+        <input type="button" @click="startUpload" name="Upload" value="Upload"/>
+    
+    </form>
+</div>
 
 </template>
 
@@ -19,11 +15,33 @@
 
 <script>
 import axios from "axios";
-//<img v-bind:src="require('../assets/giros.jpg')" />
-import $ from 'jquery';
 export default {
-    name: "ImageView"
+    name: "ImageView",
+    data: () => ({
+        formData: null
+    }),
+    methods: {
+        onImageUpload() {
+            let file = this.$refs.uploadImage.files[0];
+            this.formData = new FormData();
+            this.formData.append("file", file);
+        },
+        startUpload() {
+            axios({
+                url: "http://localhost:8081/upload/image",
+                method: 'POST',
+                data: this.formData,
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type' : 'multipart/form-data'
+                },
+            }).then(response => {
+                console.log(JSON.stringify(response.data));
+            });
+        }
+    }
+
 }
-   
+
 </script>
 
