@@ -57,39 +57,57 @@ public class KorisnikController {
         }
     }
 
-    @PutMapping("izmeni-profil")
-    public ResponseEntity izmeniProfil(@RequestBody KorisnikAzuriranDto korisnikAzuriranDto, HttpSession session) {
+    // metoda kojom cemo znati kome sta da prikazemo
+    @GetMapping(
+            value = "vratiUlogu",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity vratiUlogu(HttpSession session) {
         if (sessionService.validateSession(session)) {
-            HashMap<String, String> errorDic = ValidateIzmeni(korisnikAzuriranDto);
+            Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao
+
+            return new ResponseEntity(ulogovani.getUloga(), HttpStatus.OK);
+        } else
+            return new ResponseEntity("neovlascen_pristup", HttpStatus.FORBIDDEN);
+    }
+
+    // post -> put zbog axiosa
+    @PostMapping("izmeni-profil")
+    public ResponseEntity izmeniProfil(@RequestBody KorisnikDto KorisnikDto, HttpSession session) {
+        if (sessionService.validateSession(session)) {
+            HashMap<String, String> errorDic = ValidateIzmeni(KorisnikDto);
 
             if (!errorDic.isEmpty()){
                 return new ResponseEntity(errorDic, HttpStatus.BAD_REQUEST);
             }
 
+            System.out.println("prosao1");
+
             Korisnik korisnik = korisnikService.findByUsername((String) session.getAttribute("korisnicko_ime"));
-            korisnikService.azuriraj(korisnikAzuriranDto, korisnik, session);
+            korisnikService.azuriraj(KorisnikDto, korisnik, session);
             KorisnikAzuriranDto korisnikAzuriranDtoIzlaz = new KorisnikAzuriranDto(korisnik);
 
+            System.out.println("prosao2");
             return new ResponseEntity(korisnikAzuriranDtoIzlaz, HttpStatus.OK);
         } else {
+            System.out.println("prosao3");
             return new ResponseEntity("Neispravna sesija, ulogujte se ponovo", HttpStatus.BAD_REQUEST);
         }
     }
 
-    private HashMap<String, String> ValidateIzmeni(KorisnikAzuriranDto korisnikAzuriranDto){
+    private HashMap<String, String> ValidateIzmeni(KorisnikDto KorisnikDto){
         HashMap<String, String> errorDic = new HashMap<>();
 
-        if (korisnikAzuriranDto.getIme() != null && (korisnikAzuriranDto.getIme().isEmpty() || korisnikAzuriranDto.getIme().length()>25))
+        if (KorisnikDto.getIme() != null && (KorisnikDto.getIme().isEmpty() || KorisnikDto.getIme().length()>25))
             errorDic.put("Ime", "Polje ime je neispravno uneseno");
-        if (korisnikAzuriranDto.getPrezime() != null && (korisnikAzuriranDto.getPrezime().isEmpty() || korisnikAzuriranDto.getPrezime().length()>25))
+        if (KorisnikDto.getPrezime() != null && (KorisnikDto.getPrezime().isEmpty() || KorisnikDto.getPrezime().length()>25))
             errorDic.put("Prezime", "Polje prezime je neispravno uneseno");
-        if (korisnikAzuriranDto.getKorisnickoIme() != null && (korisnikAzuriranDto.getKorisnickoIme().isEmpty() || korisnikAzuriranDto.getKorisnickoIme().length()>25))
+        if (KorisnikDto.getKorisnickoIme() != null && (KorisnikDto.getKorisnickoIme().isEmpty() || KorisnikDto.getKorisnickoIme().length()>25))
             errorDic.put("Korisnicko ime", "Polje korisnicko ime je neispravno uneseno");
-        if (korisnikAzuriranDto.getKorisnickoIme() != null && (korisnikService.CheckUserAgainst(korisnikAzuriranDto.getKorisnickoIme())))
-            errorDic.put("Korisnicko ime", "Korisnicko ime vec postoji, unesite drugo");
-        if (korisnikAzuriranDto.getLozinka() != null && (korisnikAzuriranDto.getLozinka().isEmpty() || korisnikAzuriranDto.getLozinka().length()>25))
+        /*if (KorisnikDto.getKorisnickoIme() != null && (korisnikService.CheckUserAgainst(KorisnikDto.getKorisnickoIme())))
+            errorDic.put("Korisnicko ime", "Korisnicko ime vec postoji, unesite drugo");*/
+        if (KorisnikDto.getLozinka() != null && (KorisnikDto.getLozinka().isEmpty() || KorisnikDto.getLozinka().length()>25))
             errorDic.put("Lozinka", "Polje lozinka je neispravno uneseno");
-        if (korisnikAzuriranDto.getDatum_rodjenja() != null && (korisnikAzuriranDto.getDatum_rodjenja().after(new Date()) || (korisnikAzuriranDto.getDatum_rodjenja().before(new Date(1900-1900, 01,01)))))
+        if (KorisnikDto.getDatum_rodjenja() != null && (KorisnikDto.getDatum_rodjenja().after(new Date()) || (KorisnikDto.getDatum_rodjenja().before(new Date(1900-1900, 01,01)))))
             errorDic.put("Datum", "Polje datum je neispravno uneseno");
 
         return errorDic;
@@ -314,5 +332,26 @@ public class KorisnikController {
             return new ResponseEntity("Neovlascen pristup", HttpStatus.FORBIDDEN);
     }
 
+    @GetMapping(
+            value = "kupac",
+            /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> dobavljanjeInformacijaOkupcu(HttpSession session) {
 
+        //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
+        Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao
+
+        if (ulogovani == null)
+            return new ResponseEntity("Morate da se ulogujete, da biste mogli da vrsite ovu akciju!", HttpStatus.BAD_REQUEST);
+        if (ulogovani.getUloga() != Korisnik.Uloga.Kupac)
+            return new ResponseEntity("Dozvoljeno samo kupcima!", HttpStatus.BAD_REQUEST);
+
+        Kupac ulogovaniKupac = (Kupac) ulogovani;
+
+        KupacDto kupacDto = new KupacDto();
+        kupacDto.setBroj_bodova(ulogovaniKupac.getBroj_bodova());
+        kupacDto.setTip_kupca(ulogovaniKupac.getTip());
+
+        return new ResponseEntity(kupacDto, HttpStatus.OK);
+    }
 }

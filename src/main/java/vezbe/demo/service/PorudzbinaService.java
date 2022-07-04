@@ -276,5 +276,8 @@ public class PorudzbinaService {
         return false;
     }
 
+    public List<Porudzbina> findAll() {
+        return porudzbinaRepository.findAll();
+    }
 
 }

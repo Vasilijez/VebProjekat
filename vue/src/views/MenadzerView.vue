@@ -1,34 +1,61 @@
 <template>
 
-<link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
-    />
-
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
+<br>  
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand">Odnesi</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Početna</a>
+          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+        </li>
+        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Odjavi se</a>
+          <a class="nav-link active" aria-current="page" href="/profil">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+
+<link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
+    />
+
 
 <br>
 <h4>Moj restoran</h4>
@@ -75,22 +102,38 @@
   <tbody>
     <tr  v-for="(porudzbina,i) in porudzbine" :key="i">
             <th scope="row">{{i}}</th>
-            <td>{{porudzbina.datum_vreme}}</td>
-            <td>{{porudzbina.datum_vreme}}</td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(0,10)}}</a>                
+                <a v-else>-</a>                
+            </td>
+            <td>
+                <a v-if="porudzbina.status != 'u_korpi'">{{porudzbina.datum_vreme.substring(11,19)}}</a>                
+                <a v-else>-</a>                
+            </td>
             <td>{{porudzbina.cena}}</td>
             <td>{{porudzbina.status}}</td>
             <td>
-              <div class="dropdown show">
-  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-    Dropdown link
-  </a>
+              <div v-if="porudzbina.status == 'obrada'" class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                  Izaberi
+                </a>
 
-  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <a class="dropdown-item" href="#">Action</a>
-    <a class="dropdown-item" href="#">Another action</a>
-    <a class="dropdown-item" href="#">Something else here</a>
-  </div>
-</div>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <li><a class="dropdown-item" @click="promenaUpripremi(porudzbina.id)">U pripremi</a></li>
+                </ul>
+              </div>
+              <div v-else-if="porudzbina.status == 'u_pripremi'" class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                  Izaberi
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <li><a class="dropdown-item" @click="promenaUcekaDostavljaca(porudzbina.id)">Čeka dostavljača</a></li>
+                </ul>
+              </div>
+              <div v-else class="dropdown">
+                <i>Nemoguće promeniti status</i>
+              </div>
             </td>
     </tr>
   </tbody>
@@ -108,7 +151,7 @@
       <th class="col-md-2 col-xs-3">Tip artikla</th>
       <th class="col-md-2 col-xs-3">Kolicina</th>
       <th class="col-md-2 col-xs-3">Opis</th>      
-      <th class="col-md-2 col-xs-3">Slika (todo)</th>
+      <th class="col-md-2 col-xs-3">Slika</th>
       <th class="col-md-2 col-xs-3">Obriši</th>
       <th class="col-md-2 col-xs-3">Izmeni</th>
       
@@ -125,7 +168,11 @@
             <td>{{artikal.tip}}</td>
             <td>{{artikal.kolicina}}</td>
             <td>{{artikal.opis}}</td>
-            <td></td>
+            
+            <td>
+              <img v-if="artikal.id <= 10" v-bind:src="require('../assets/' + artikal.id + '.jpg')" style="width:100px;height:100px;"/>
+              <img v-else v-bind:src="'http://localhost:8081/get/image/' + artikal.naziv + '.jpg'" style="width:100px;height:100px;"/>
+            </td>
             <td><button @click="deleteEmployee(artikal.id)" type="button" class="btn btn-danger"><i class="bi bi-trash text-light"></i> Obriši</button></td>
             <td><button @click="this.$router.push('/artikal?id=' + artikal.id)" type="button" class="btn btn-secondary"><i class="bi bi-check-circle-fill text-light"></i> Izmeni</button></td>
      
@@ -134,32 +181,11 @@
 </table>
 
 <td><button @click="this.$router.push('/artikal-dodaj')" type="button" class="btn btn-primary"><i class="bi bi-check-circle-fill text-light"></i> Dodaj artikal</button></td>
-     
 
-<!--
-<br>
-<h4>Komentari</h4>
-<table class="table table-hover table-bordered results">
-  <thead>
-    <tr>
-      <th class="col-md-1 col-xs">#</th>
-      <th class="col-md-2 col-xs-3">Tekst komentara</th>
-      <th class="col-md-2 col-xs-3">Ocena komentara</th>
-    </tr>
-    <tr class="warning no-result">
-      <td colspan="4"><i class="fa fa-warning"></i> No result</td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr  v-for="(komentar,i) in this.restoran.komentari" :key="i">
-            <th scope="row">{{i}}</th>
-            <td>{{komentar.tekst_komentara}}</td>
-            <td>{{komentar.ocena}}</td>
-     </tr>
-  </tbody>
-</table>
--->
+<br>  
 </template>
+
+
 <script>
 // <td><button @click="this.$router.push('/porudzbina?id=' + porudzbina.id)" type="button" class="btn btn-secondary"><i class="bi bi-check-circle-fill text-light"></i> Izmeni</button></td>
      
@@ -168,9 +194,10 @@ export default {
     name: 'MenadzerView',
     data: function() {
         return {
+          uloga: "neovlascen_pristup",
             menadzer: {
                 restoran: { 
-                    naziv: "", 
+                    naziv: "neovlascen_pristup", 
                     tipRestorana: "", 
                     artikli: [], 
                     lokacija: { 
@@ -218,10 +245,20 @@ export default {
                 console.log(err)
             })
 
+            axios // uloga
+            .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
+            .then((res) => {
+                this.uloga = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                alert("Neovlascen pristup")
+                this.$router.push("/login")
+            })
+
 
     },
     methods: {
-        deleteEmployee: function (naziv) {
+        deleteEmployee: function(naziv) {
           //this.restoran_naziv.naziv = naziv;
           //console.log(this.restoran_naziv)
         axios
@@ -233,8 +270,33 @@ export default {
             .catch(error => {
                 console.log(error)
             }); 
-        }
-
+        },
+        promenaUpripremi: function(id) {
+          //this.restoran_naziv.naziv = naziv;
+          console.log(id)
+        axios
+            .get('http://localhost:8081/api/porudzbinaUPripremi/' + id, {withCredentials: true})
+            .then(res => {
+                console.log(res)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.log(error)
+            }); 
+        },
+        promenaUcekaDostavljaca: function(id) {
+          //this.restoran_naziv.naziv = naziv;
+          console.log(id)
+        axios
+            .get('http://localhost:8081/api/porudzbinaCekaDostavljaca/' + id, {withCredentials: true})
+            .then(res => {
+                console.log(res)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.log(error)
+            }); 
+        },
       
     }
     

@@ -5,30 +5,35 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"
     />
 
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand">Odnesi</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Početna</a>
+          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+        </li>
+        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Odjavi se</a>
+          <a class="nav-link active" aria-current="page" href="/profil">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
 
 
 <br>
@@ -42,6 +47,7 @@
       <th class="col-md-2 col-xs-3">Vreme porudzbine</th>
       <th class="col-md-2 col-xs-3">Cena</th>
       <th class="col-md-2 col-xs-3">Status</th>
+      <th class="col-md-2 col-xs-3">Izmeni status</th>
     </tr>
     <tr class="warning no-result">
       <td colspan="4"><i class="fa fa-warning"></i> No result</td>
@@ -55,10 +61,34 @@
             <td>{{porudzbina.datum_vreme.substring(11,19)}}</td>
             <td>{{porudzbina.cena}}</td>
             <td>{{porudzbina.status}}</td>
+            <td>
+              <div v-if="porudzbina.status == 'ceka_dostavljaca'" class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                  Izaberi
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <li><a class="dropdown-item" @click="promenaUtransportu(porudzbina.id)">U transportu</a></li>
+                </ul>
+              </div>
+              <div v-else-if="porudzbina.status == 'u_transportu'" class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                  Izaberi
+                </a>
+
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                  <li><a class="dropdown-item" @click="promenaUdostavljena(porudzbina.id)">Dostavljena</a></li>
+                </ul>
+              </div>
+              <div v-else class="dropdown">
+                <i>Nemoguće promeniti status</i>
+              </div>
+            </td>
      </tr>
   </tbody>
 </table>
-  
+ 
+
 </template>
 <script>
 import axios from "axios";
@@ -66,6 +96,7 @@ export default {
     name: 'DostavljacView',
     data: function() {
         return {
+            uloga: "neovlascen_pristup",
             porudzbine: [{
                         artikli: [],
                         restoran: {},
@@ -87,6 +118,44 @@ export default {
             .catch((err) =>{ // todo neovlascen pristup
                 console.log(err)
             })
+
+        axios // uloga
+            .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
+            .then((res) => {
+                this.uloga = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
+    },
+    methods: {
+        promenaUtransportu: function (id) {
+          //this.restoran_naziv.naziv = naziv;
+          console.log(id)
+        axios
+            .get('http://localhost:8081/api/porudzbinaUTransportu/' + id, {withCredentials: true})
+            .then(res => {
+                console.log(res)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.log(error)
+            }); 
+        },
+        promenaUdostavljena: function (id) {
+          //this.restoran_naziv.naziv = naziv;
+          console.log(id)
+        axios
+            .get('http://localhost:8081/api/porudzbinaDostavljena/' + id, {withCredentials: true})
+            .then(res => {
+                console.log(res)
+                window.location.reload();
+            })
+            .catch(error => {
+                console.log(error)
+            }); 
+        },
+      
     }
     
 }

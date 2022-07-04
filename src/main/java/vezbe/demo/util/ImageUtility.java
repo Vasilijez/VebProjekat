@@ -1,6 +1,5 @@
 package vezbe.demo.util;
 
-
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;

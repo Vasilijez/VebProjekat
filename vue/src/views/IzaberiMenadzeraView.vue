@@ -5,30 +5,35 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#">Navbar</a>
+    <a class="navbar-brand">Odnesi</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="/">Početna</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Početna</a>
+          <a v-if="this.uloga === 'neovlascen_pristup'" class="nav-link active" aria-current="page" href="/login">Uloguj se</a>
+        </li>
+        <li  v-if="this.uloga !== 'neovlascen_pristup'" class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/odjavi-se">Odjavi se</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Odjavi se</a>
+          <a class="nav-link active" aria-current="page" href="/profil">Profil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+          <a class="nav-link active" aria-current="page" href="/dashboard">Dashboard</a>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+<br>
 
-<h2>Menadzeri</h2>
+<h4>Menadžeri</h4>
+<br>
 <table class="table table-hover table-bordered results">
   <thead>
     <tr>
@@ -58,7 +63,8 @@
   </tbody>
 </table>
 
-<h2>Restorani</h2>
+<h4>Restorani</h4>
+<br>
 <table class="table table-hover table-bordered results">
   <thead>
     <tr>
@@ -96,19 +102,14 @@
 <input @click = "povezi()" class="btn btn-success" type="submit" value="Potvrdi dodelu">
 
 
+    <div v-if="this.uloga === 'Admin'">
     <br>
-    <br>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
-    <br>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
-    <br>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
-    <br>
-    <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
-    <br>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-menadzera')">Kreiraj menadzera</button>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-dostavljaca')">Kreiraj dostavljaca</button>
+    <button type="button" class="btn btn-secondary btn-block me-4" @click="this.$router.push('/kreiraj-restoran')">Kreiraj restoran</button>
+    <button type="button" class="btn btn-danger btn-block me-4" @click="this.$router.push('/obrisi-restoran')">Obrisi restoran</button>
     <button type="button" class="btn btn-primary btn-block me-4" @click="this.$router.push('/izaberi-menadzera')">Izaberi menadžera</button>
-
-
+    </div>
 
 
 </template>
@@ -122,6 +123,7 @@ export default {
     name: "IzaberiMenadzera",
     data: function () {
         return {
+          uloga: "neovlascen_pristup",
             menadzeri: [],
             restorani: [],
             menadzer: { naziv: "" },
@@ -129,7 +131,16 @@ export default {
         };
     },
     mounted: function () {
-      
+      axios // uloga
+            .get('http://localhost:8081/api/vratiUlogu/', {withCredentials: true})
+            .then((res) => {
+                this.uloga = res.data
+           })
+            .catch((err) =>{ // todo neovlascen pristup
+                console.log(err)
+            })
+
+
     axios
       .get("http://localhost:8081/api/menadzeri-bez-restorana", {withCredentials:'include'})
       .then((res) => {
@@ -182,7 +193,8 @@ export default {
    
 </script>
 
-<style>
+<style scoped>
+
 
 body{
   padding:20px 20px;

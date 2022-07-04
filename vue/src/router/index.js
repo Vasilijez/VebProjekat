@@ -1,11 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import EmployeesView from '../views/EmployeesView.vue'
-import RestoraniView from '../views/RestoraniView.vue'
 import RestoranView from '../views/RestoranView.vue'
-import EmployeeView from '../views/EmployeeView.vue'
-import AddEmployeeView from '../views/AddEmployeeView.vue'
-import EditEmployeeView from '../views/EditEmployeeView.vue'
 import LoginView from '../views/LoginView.vue'
 import AdminView from '../views/AdminView.vue'
 import MenadzerView from '../views/MenadzerView.vue'
@@ -22,12 +17,36 @@ import ArtikalDodajView from '../views/ArtikalDodajView.vue'
 import KupacView from '../views/KupacView.vue'
 import DostavljacView from '../views/DostavljacView.vue'
 import PregledKorpeView from '../views/PregledKorpeView.vue'
+import KomentarView from '../views/KomentarView.vue'
+import ImageView from '../views/ImageView.vue'
+import DashboardView from '../views/DashboardView.vue'
+import OdjaviSeView from '../views/OdjaviSeView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/odjavi-se',
+    name: 'OdjaviSe',
+    component: OdjaviSeView
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: DashboardView
+  },
+  {
+    path: '/image',
+    name: 'Image',
+    component: ImageView
+  },
+  {
+    path: '/komentar',
+    name: 'Komentar',
+    component: KomentarView
   },
   {
     path: '/pregled-korpe',
@@ -105,11 +124,6 @@ const routes = [
     component: MenadzerView
   },
   {
-    path: '/restorani',
-    name: 'restorani',
-    component: RestoraniView
-  },
-  {
     path: '/admin',
     name: 'admin',
     component: AdminView
@@ -118,26 +132,6 @@ const routes = [
     path: '/restoran',
     name: 'restoran',
     component: RestoranView
-  },
-  {
-    path: '/employees',
-    name: 'employees',
-    component: EmployeesView
-  },
-  {
-    path: '/employee',
-    name: 'employee',
-    component: EmployeeView
-  },
-  {
-    path: '/add-employee',
-    name: 'add-employee',
-    component: AddEmployeeView
-  },
-  {
-    path: '/edit-employee',
-    name: 'edit-employee',
-    component: EditEmployeeView
   }
 ]
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import vezbe.demo.dto.KomentarDto;
 import vezbe.demo.dto.KorpaDto;
 import vezbe.demo.model.*;
+import vezbe.demo.repository.DostavljacRepository;
 import vezbe.demo.service.*;
 
 import javax.servlet.http.HttpSession;
@@ -36,6 +37,9 @@ public class PorudzbineController {
     @Autowired
     RestoranService restoranService;
 
+    @Autowired
+    DostavljacRepository dostavljacRepository;
+
     @GetMapping(
     value = "/porudzbine",
     /*consumes = MediaType.APPLICATION_JSON_VALUE, - bio problem u ovome*/
@@ -49,19 +53,29 @@ public class PorudzbineController {
             return new ResponseEntity(listaPorudzbina, HttpStatus.OK);
         }
         else if (sessionService.validateUloga(session,"Dostavljac") && sessionService.validateSession(session)) {
-            Korisnik korisnik = korisnikService.findByUsername((String) session.getAttribute("korisnicko_ime"));
+            Dostavljac dostavljac = (Dostavljac) korisnikService.findByUsername((String) session.getAttribute("korisnicko_ime"));
 
-            Set<Porudzbina> listaPorudzbina = ((Dostavljac)korisnik).getPorudzbine();
+            Set<Porudzbina> listaPorudzbina = dostavljac.getPorudzbine();
 
+            List<Porudzbina> novePorudzbine = porudzbinaService.findAll();
+            for (Porudzbina porudzbina : novePorudzbine) {
+                if (porudzbina.getStatus() == Porudzbina.Status.ceka_dostavljaca) {
+                    listaPorudzbina.add(porudzbina);
+                }
+            }
 
-            Set<Porudzbina> finalnaLista = new HashSet<>();
+            dostavljac.setPorudzbine(listaPorudzbina);
+            dostavljacRepository.save(dostavljac); //...
+
+            // nije dobro, jer ne on mora da vidi i porudzbine koje su u transportu
+            /*Set<Porudzbina> finalnaLista = new HashSet<>();
             for (Porudzbina porudzbina : listaPorudzbina) {
                 if (porudzbina.getStatus() == Porudzbina.Status.ceka_dostavljaca) {
                     finalnaLista.add(porudzbina);
                 }
-            }
+            }*/
 
-            return new ResponseEntity(finalnaLista, HttpStatus.OK);
+            return new ResponseEntity(listaPorudzbina, HttpStatus.OK);
         }
         else if (sessionService.validateUloga(session,"Menadzer") && sessionService.validateSession(session)) {
             Korisnik korisnik = korisnikService.findByUsername((String) session.getAttribute("korisnicko_ime"));
@@ -367,7 +381,8 @@ public class PorudzbineController {
 
 
     //-----------------------------------------------------------------------------
-    @PutMapping("porudzbinaUPripremi/{id}")
+    // sa put -> get zbog axiosa, nece da radi sa post ili put
+    @GetMapping("porudzbinaUPripremi/{id}")
     public ResponseEntity<String> porudzbinaUPripremi(@PathVariable UUID id, HttpSession session) throws Exception {
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
@@ -391,7 +406,8 @@ public class PorudzbineController {
         return ResponseEntity.ok(porudzbinaService.UPripremi(id));
     }
 
-    @PutMapping("porudzbinaCekaDostavljaca/{id}")
+    // sa put -> get zbog axiosa, nece da radi sa post ili put
+    @GetMapping("porudzbinaCekaDostavljaca/{id}")
     public ResponseEntity<String> porudzbinaCekaDostavljaca(@PathVariable UUID id, HttpSession session) throws Exception {
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
@@ -415,7 +431,7 @@ public class PorudzbineController {
         return ResponseEntity.ok(porudzbinaService.CekaDostavljaca(id));
     }
 
-    @PutMapping("porudzbinaUTransportu/{id}")
+    @GetMapping("porudzbinaUTransportu/{id}")
     public ResponseEntity<String> porudzbinaUTransportu(@PathVariable UUID id, HttpSession session) throws Exception {
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
@@ -439,7 +455,7 @@ public class PorudzbineController {
         return ResponseEntity.ok(porudzbinaService.UTransportu(id));
     }
 
-    @PutMapping("porudzbinaDostavljena/{id}")
+    @GetMapping("porudzbinaDostavljena/{id}")
     public ResponseEntity<String> porudzbinaDostavljena(@PathVariable UUID id, HttpSession session) throws Exception {
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
@@ -465,6 +481,7 @@ public class PorudzbineController {
 
     @PostMapping("dodajKomentar/{id}")
     public ResponseEntity<String> dodajKomentar(@PathVariable UUID id, @RequestBody KomentarDto komentarDto, HttpSession session) throws Exception {
+        // U sustini potreban nam je samo naziv restorana
 
         //Korisnik ulogovani = (Korisnik) session.getAttribute("Korisnik");
         Korisnik ulogovani = korisnikService.findByUsername(sessionService.getKorisnicko_Ime(session)); // dodao

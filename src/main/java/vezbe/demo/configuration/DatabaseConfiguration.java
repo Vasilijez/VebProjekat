@@ -11,8 +11,11 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import vezbe.demo.model.*;
 import vezbe.demo.repository.*;
 
+import javax.persistence.Column;
 import java.io.*;
+import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.*;
 
@@ -55,8 +58,15 @@ public class DatabaseConfiguration {
     @Autowired
     private KomentarRepository komentarRepository;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     @Bean
     public boolean instantiate(){
+
+
+
+
 
         Lokacija lokacija1 = new Lokacija(32.51,21.42,"Vojvodjanska 35");
         Lokacija lokacija2 = new Lokacija(12.23,11.32,"Partizanska 95");
@@ -134,7 +144,7 @@ public class DatabaseConfiguration {
         kupacRepository.save(kupac2);
 
         Porudzbina porudzbina1 = new Porudzbina(restoran1, kupac1, Porudzbina.Status.ceka_dostavljaca);
-        Porudzbina porudzbina2 = new Porudzbina(restoran2, kupac1, Porudzbina.Status.u_pripremi);
+        Porudzbina porudzbina2 = new Porudzbina(restoran2, kupac1, Porudzbina.Status.ceka_dostavljaca);
         porudzbinaRepository.save(porudzbina1);
         porudzbinaRepository.save(porudzbina2);
 

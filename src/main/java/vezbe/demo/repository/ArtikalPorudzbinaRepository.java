@@ -6,4 +6,7 @@ import vezbe.demo.model.ArtikalPorudzbina;
 
 @Repository
 public interface ArtikalPorudzbinaRepository extends JpaRepository<ArtikalPorudzbina, Long> {
+    ArtikalPorudzbina findByArtikalId(Long id);
+
+
 }

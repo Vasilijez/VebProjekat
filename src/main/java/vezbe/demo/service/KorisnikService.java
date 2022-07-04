@@ -3,6 +3,7 @@ package vezbe.demo.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import vezbe.demo.dto.KorisnikAzuriranDto;
+import vezbe.demo.dto.KorisnikDto;
 import vezbe.demo.model.Korisnik;
 import vezbe.demo.repository.KorisnikRepository;
 
@@ -23,22 +24,22 @@ public class KorisnikService {
         return korisnikRepository.findAll();
     }
 
-    public Korisnik azuriraj(KorisnikAzuriranDto korisnikAzuriranDto, Korisnik korisnik, HttpSession session) {
+    public Korisnik azuriraj(KorisnikDto KorisnikDto, Korisnik korisnik, HttpSession session) {
 
-        if (korisnikAzuriranDto.getIme() != null)
-            korisnik.setIme(korisnikAzuriranDto.getIme());
-        if (korisnikAzuriranDto.getPrezime() != null)
-            korisnik.setPrezime(korisnikAzuriranDto.getPrezime());
-        if (korisnikAzuriranDto.getLozinka() != null)
-            korisnik.setLozinka(korisnikAzuriranDto.getLozinka());
-        if (korisnikAzuriranDto.getP() != null)
-            korisnik.setP(korisnikAzuriranDto.getP());
-        if (korisnikAzuriranDto.getDatum_rodjenja() != null)
-            korisnik.setDatum_rodjenja(korisnikAzuriranDto.getDatum_rodjenja());
-        if (korisnikAzuriranDto.getKorisnickoIme() != null) {
+        if (KorisnikDto.getIme() != null)
+            korisnik.setIme(KorisnikDto.getIme());
+        if (KorisnikDto.getPrezime() != null)
+            korisnik.setPrezime(KorisnikDto.getPrezime());
+        if (KorisnikDto.getLozinka() != null)
+            korisnik.setLozinka(KorisnikDto.getLozinka());
+        if (KorisnikDto.getP() != null)
+            korisnik.setP(KorisnikDto.getP());
+        if (KorisnikDto.getDatum_rodjenja() != null)
+            korisnik.setDatum_rodjenja(KorisnikDto.getDatum_rodjenja());
+        if (KorisnikDto.getKorisnickoIme() != null) {
             session.removeAttribute("korisnicko_ime");
-            session.setAttribute("korisnicko_ime", korisnikAzuriranDto.getKorisnickoIme());
-            korisnik.setKorisnickoIme(korisnikAzuriranDto.getKorisnickoIme());
+            session.setAttribute("korisnicko_ime", KorisnikDto.getKorisnickoIme());
+            korisnik.setKorisnickoIme(KorisnikDto.getKorisnickoIme());
         }
 
         return korisnikRepository.save(korisnik);
